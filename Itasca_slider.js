@@ -51,14 +51,26 @@ var Itasca_slider_app = (function (controls) {
           .attr("type", "radio")
           .attr("name", short_name)
           .attr("value", options[i]);
-      if (i===checked) { tmp.attr("checked",""); }
+      if (options[i]===checked) { tmp.attr("checked",""); }
     }
 
   };
 
+
+  var add_check_box = function(target, short_name, name, checked) {
+    d3.select(target)
+      .append('div').text(name);
+    var tmp =  d3.select(target).append("input")
+        .attr("type", "checkbox")
+        .attr("name", short_name)
+        .attr("value", short_name);
+    if (checked) { tmp.attr("checked",""); }
+  };
+
   return {
     add_float_slider: add_float_slider,
-    add_radio_buttons: add_radio_buttons
+    add_radio_buttons: add_radio_buttons,
+    add_check_box: add_check_box
   };
 });
 

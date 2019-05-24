@@ -17,16 +17,16 @@
     <script src="./d3.v5.min.js" charset="utf-8"></script>
     <script src="./d3-simple-slider.js" charset="utf-8"></script>
     <script src="./Itasca_slider.js" charset="utf-8"></script>
-    <script src="./example.js" charset="utf-8"></script>
-
     <script>
 
       var my_app = Itasca_slider_app();
       my_app.add_float_slider("#inputs", "A", "Amplitude", 1, 0.1, 10);
       my_app.add_float_slider("#inputs", "f", "Frequency", 1, 0.1, 10);
       my_app.add_float_slider("#inputs", "p", "Phase", 0, 0, 2*Math.PI);
-      my_app.add_radio_buttons("#inputs", "exp", "E Type", ["ANFO",
-      "Emulsion", "Doped Emulsion", "Heavy ANFO"], 0);
+      my_app.add_radio_buttons("#inputs", "exp", "E Type", ["Sine",
+      "Cosine"], "Sine");
+
+      my_app.add_check_box("#inputs", "damping", "Damping", false);
 
 
     </script>
