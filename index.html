@@ -27,7 +27,12 @@
       "Cosine"], "Sine");
 
       my_app.add_check_box("#inputs", "damping", "Damping", false);
+      function my_callback(data) {
+        console.log("in my callback");
+        console.log(data);
+      }
 
+      my_app.add_callback(my_callback);
 
     </script>
   </body>
