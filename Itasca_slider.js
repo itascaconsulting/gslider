@@ -37,7 +37,6 @@ var Itasca_slider_app = (function (controls) {
       .attr("data-currentvalue", start);
 
     var formatter = (max < 1e3) ? d3.format("") : d3.format(".1e");
-
     var slider = d3
         .sliderHorizontal()
         .min(min)
@@ -50,6 +49,8 @@ var Itasca_slider_app = (function (controls) {
         .on('onchange.a', function (value)
             { internal_callback(); })
         .on('drag', function (value)
+            { input_box.property("value", d3.format(".6e")(value)); })
+        .on('end', function (value)
             { input_box.property("value", d3.format(".6e")(value)); });
     getters_[short_name] = (function () { return slider.value(); });
 
@@ -86,9 +87,8 @@ var Itasca_slider_app = (function (controls) {
             slider.value(newValue);
           }
         }
-        };
+      };
     });
-
   };
 
   var add_radio_buttons = function(target, short_name, name, options,
@@ -100,11 +100,14 @@ var Itasca_slider_app = (function (controls) {
       var tmp =  d3.select(target).append("input")
           .attr("type", "radio")
           .attr("name", short_name)
-          .attr("value", options[i]);
+          .attr("value", options[i])
+          .on("change", function () { internal_callback(); });
       if (options[i]===checked) { tmp.attr("checked",""); }
     }
+    getters_[short_name] = function () {
+      return document.querySelector('input[name="'+short_name+'"]:checked').value;
+    };
   };
-
 
   var add_check_box = function(target, short_name, name, checked) {
     d3.select(target)
@@ -114,7 +117,8 @@ var Itasca_slider_app = (function (controls) {
       .attr("name", short_name)
       .attr("value", short_name);
     if (checked) { input.attr("checked",""); }
-    getters_[short_name] = function () { return true; };
+    // how do we check if the checkbox is checked.
+    getters_[short_name] = function () { return input.attr("checked") ? true : false; };
   };
 
   var add_callback = function (callback) {
