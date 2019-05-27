@@ -1,3 +1,6 @@
+// in the slider the input box shoud be authoritative
+// ensure a valid value in input box when focus leaves?
+
 var Itasca_slider_app = (function (controls) {
   var getters_ = {},
       user_callback = undefined,
@@ -132,3 +135,183 @@ var Itasca_slider_app = (function (controls) {
     add_callback: add_callback
   };
 });
+
+function plot_xy(destination, datasets, options) {
+  document.querySelectorAll(destination)[0].innerHTML ="";
+
+  var options = options || {};
+  var colors = options.colors || d3.scale.category10().domain(d3.range(10));
+  var color_index = options.color_index || 0;
+  var x_label = options.x_label || "";
+  var y_label = options.y_label || "";
+  var y2_label = options.y2_label || "";
+  var title = options.title || "";
+
+  var margin = {top: 30, right: 80, bottom: 40, left: 80},
+      width = 400 - margin.left - margin.right,
+      height = 220 - margin.top - margin.bottom;
+  var     x = d3.scale.linear().range([0, width]);
+  var     y = d3.scale.linear().range([height, 0]);
+  var     y2 = d3.scale.linear().range([height, 0]);
+
+  var xAxis = d3.svg.axis().scale(x)
+      .orient("bottom")
+      .innerTickSize(-height)
+      .ticks(5);
+  var yAxis = d3.svg.axis().scale(y)
+      .orient("left")
+      .innerTickSize(-width)
+      .ticks(5)
+      .tickFormat(d3.format(".1e"));
+
+  var yAxis_right = undefined;
+  if (("right_y_scale" in options) || ("right_data" in options)) {
+    yAxis_right =  d3.svg.axis().scale(y2)
+      .orient("right")
+      .ticks(5)
+      .tickFormat(d3.format(".1e"));
+  }
+
+  var valueline = function(xa, ya, xscale, yscale){
+    return d3.svg.line()
+      .x(function(d,i) { return xscale(xa[i]); })
+      .y(function(d,i) { return yscale(ya[i]); })
+    (Array(xa.length));
+  };
+
+
+  var chart1 = d3.select(destination)
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .attr("style", "overflow:hidden;")
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  chart1.append("text")
+    .attr("text-anchor", "middle")
+    .attr("transform", "translate("+ (width/2)+","+(height+margin.bottom/1.5)+")")
+    .text(x_label);
+
+  chart1.append("text")
+    .attr("text-anchor", "middle")
+    .attr("transform", "translate("+ (width/2)+","+(-margin.top/2.5)+")")
+    .attr("style", "font-size:15px; font-weight:bold")
+    .text(title);
+
+  chart1.append("text")
+    .attr("text-anchor", "middle")
+    .attr("transform",
+          "translate("+(-margin.left/1.5)+","+(height/2.0)+")rotate(-90)")
+    .text(y_label);
+
+  chart1.append("text")
+    .attr("text-anchor", "middle")
+    .attr("transform", "translate("+(width + margin.right/1.3)+","+(height/2)+")rotate(-90)")
+    .text(y2_label);
+
+  var xmin = d3.min(datasets.map(function (d) { return d3.min(d[0]);}));
+  var xmax = d3.max(datasets.map(function (d) { return d3.max(d[0]);}));
+  var ymin = d3.min(datasets.map(function (d) { return d3.min(d[1]);}));
+  var ymax = d3.max(datasets.map(function (d) { return d3.max(d[1]);}));
+
+  var xmin_use = "xmin" in options ? options.xmin : xmin;
+  var xmax_use = "xmax" in options ? options.xmax : xmax;
+  x.domain([xmin_use,xmax_use]);
+  var ymin_use =  "ymin" in options ? options.ymin : ymin;
+  var ymax_use =  "ymax" in options ? options.ymax : ymax;
+  y.domain([ymin_use,ymax_use]);
+  if ("right_y_scale" in options) {
+    y2.domain([ymin_use*options.right_y_scale,
+               ymax_use*options.right_y_scale]);
+  }
+
+  datasets.forEach(function (d, i) {
+    xarray = d[0];
+    yarray = d[1];
+    chart1.append("path")
+      .attr("class", "line")
+      .attr("stroke", colors((i+color_index)%10))
+      .attr("d", valueline(xarray, yarray, x, y));
+
+  });
+
+  var color_offset = datasets.length + color_index;
+
+  if ("right_data" in options) {
+    var y2min = d3.min(options.right_data.map(function (d){return d3.min(d[1]);}));
+    var y2max = d3.max(options.right_data.map(function (d){return d3.max(d[1]);}));
+    var y2min_use =  "y2min" in options ? options.y2min : y2min;
+    var y2max_use =  "y2max" in options ? options.y2max : y2max;
+    y2.domain([y2min_use,y2max_use]);
+
+    options.right_data.forEach(function (d, i) {
+      xarray = d[0];
+      yarray = d[1];
+      chart1.append("path")
+        .attr("class", "line")
+        .attr("stroke", colors((i+color_offset)%10))
+        .attr("d", valueline(xarray, yarray, x, y2));
+    });
+  }
+
+  if ("axhlines" in options) {
+    options.axhlines.forEach(function (d,i) {
+      chart1.append("path")
+        .attr("class", "horizontal_line")
+        .attr("stroke", colors((i+color_index)%10))
+        .attr("d", valueline(x.domain(), [d,d], x,y));
+    });
+  }
+  if ("ax2hlines" in options) {
+    var ax2hline_color = options.ax2hline_color || i+color_index;
+        options.ax2hlines.forEach(function (d,i) {
+      chart1.append("path")
+        .attr("class", "horizontal_line")
+        .attr("stroke", colors((ax2hline_color)%10))
+        .attr("d", valueline(x.domain(), [d,d], x,y2));
+    });
+  }
+  if ("axvlines" in options) {
+    options.axvlines.forEach(function (d,i) {
+      chart1.append("path")
+        .attr("class", "vertical_line")
+        .attr("stroke", colors((i+color_index)%10))
+        .attr("d", valueline([d,d], y.domain(),x,y));
+    });
+  }
+
+  chart1.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis);
+
+  chart1.append("g")
+    .attr("class", "y axis")
+    .call(yAxis);
+
+  if ("right_y_scale" in options || "right_data" in options) {
+    chart1.append("g")
+      .attr("class", "y axis right")
+      .attr("transform", "translate(" + width + " ,0)")
+      .call(yAxis_right);
+  }
+
+  if ("legend" in options) {
+    options.legend.forEach(function (d,i) {
+      d3.select(destination)
+        .append("svg")
+        .attr("width", 30)
+        .attr("height", 10)
+        .append("circle")
+        .attr("cx",22)
+        .attr("cy",5)
+        .attr("r",5)
+        .attr("fill",colors((i+color_index)%10));
+      d3.select(destination)
+        .append("text")
+        .text(d);
+    });
+  }
+
+}
