@@ -126,6 +126,7 @@ var Itasca_slider_app = (function (controls) {
 
   var add_callback = function (callback) {
     user_callback = callback;
+    internal_callback();
   };
 
   return {
