@@ -23,9 +23,9 @@ var Itasca_slider_app = (function (controls) {
                                   start, min_, max_) {
     var min = min_,
         max = max_;
-    console.assert(start >= min);
-    console.assert(start <= max);
-    console.assert(min < max);
+    if (!(start >= min)) throw "Start must be greater than or equal to min.";
+    if (!(start <= max)) throw "Start must be less than or equal to max.";
+    if (!(min < max)) throw  "min must be less than max.";
     d3.select(target)
       .append('div').text(name);
     var input_box = d3.select(target)
@@ -140,7 +140,7 @@ function plot_xy(destination, datasets, options) {
   document.querySelectorAll(destination)[0].innerHTML ="";
 
   var options = options || {};
-  var colors = options.colors || d3.scale.category10().domain(d3.range(10));
+  var colors = options.colors || d3.scaleOrdinal(d3.schemeCategory10).domain(d3.range(10));
   var color_index = options.color_index || 0;
   var x_label = options.x_label || "";
   var y_label = options.y_label || "";
@@ -150,15 +150,15 @@ function plot_xy(destination, datasets, options) {
   var margin = {top: 30, right: 80, bottom: 40, left: 80},
       width = 400 - margin.left - margin.right,
       height = 220 - margin.top - margin.bottom;
-  var     x = d3.scale.linear().range([0, width]);
-  var     y = d3.scale.linear().range([height, 0]);
-  var     y2 = d3.scale.linear().range([height, 0]);
+  var     x = d3.scaleLinear().range([0, width]);
+  var     y = d3.scaleLinear().range([height, 0]);
+  var     y2 = d3.scaleLinear().range([height, 0]);
 
-  var xAxis = d3.svg.axis().scale(x)
+  var xAxis = d3.axisBottom().scale(x)
       .orient("bottom")
       .innerTickSize(-height)
       .ticks(5);
-  var yAxis = d3.svg.axis().scale(y)
+  var yAxis = d3.axisTop().scale(y)
       .orient("left")
       .innerTickSize(-width)
       .ticks(5)

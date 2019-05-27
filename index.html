@@ -20,20 +20,30 @@
     <script src="./numjs.min.js" charset="utf-8"></script>
     <script>
 
-      var my_app = Itasca_slider_app();
-      my_app.add_float_slider("#inputs", "A", "Amplitude", 1, 0.1, 10);
-      my_app.add_float_slider("#inputs", "f", "Frequency", 1, 0.1, 10);
-      my_app.add_float_slider("#inputs", "p", "Phase", 0, 0, 2*Math.PI);
-      my_app.add_radio_buttons("#inputs", "ftype", "Function", ["Sine",
-      "Cosine"], "Sine");
+     var my_app = Itasca_slider_app();
+     my_app.add_float_slider("#inputs", "A", "Amplitude", 1, 0.1, 10);
+     my_app.add_float_slider("#inputs", "f", "Frequency", 1, 0.1, 10);
+     my_app.add_float_slider("#inputs", "p", "Phase", 0, 0, 2*Math.PI);
+     my_app.add_radio_buttons("#inputs", "ftype", "Function", ["Sine",
+                                                               "Cosine"], "Sine");
 
-      my_app.add_check_box("#inputs", "damping", "Damping", false);
-      function my_callback(data) {
-        console.log("in my callback");
-        console.log(data);
-      }
+     my_app.add_check_box("#inputs", "damping", "Damping", false);
 
-      my_app.add_callback(my_callback);
+     function my_callback(data) {
+
+         var n = 200,
+             x = nj.arange(0,n);
+         x = 2*Math.PI*x/(n);
+         var y = nj.sin(x);
+         plot_xy("#results", [x,y]);
+
+         console.log(x);
+         console.log("in my callback");
+         console.log(data);
+
+     }
+
+     my_app.add_callback(my_callback);
 
     </script>
   </body>
