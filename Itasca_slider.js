@@ -118,10 +118,11 @@ var Itasca_slider_app = (function (controls) {
     var input =  d3.select(target).append("input");
     input.attr("type", "checkbox")
       .attr("name", short_name)
-      .attr("value", short_name);
-    if (checked) { input.attr("checked",""); }
+      .attr("value", short_name)
+      .on("change", internal_callback);
+    if (checked) { input.property("checked",""); }
     // how do we check if the checkbox is checked.
-    getters_[short_name] = function () { return input.attr("checked") ? true : false; };
+    getters_[short_name] = function () { return input.property("checked") ? true : false; };
   };
 
   var add_callback = function (callback) {
@@ -155,12 +156,10 @@ function plot_xy(destination, datasets, options) {
   var     y2 = d3.scaleLinear().range([height, 0]);
 
   var xAxis = d3.axisBottom().scale(x)
-      .orient("bottom")
-      .innerTickSize(-height)
+      .tickSizeInner(-height)
       .ticks(5);
-  var yAxis = d3.axisTop().scale(y)
-      .orient("left")
-      .innerTickSize(-width)
+  var yAxis = d3.axisLeft().scale(y)
+      .tickSizeInner(-width)
       .ticks(5)
       .tickFormat(d3.format(".1e"));
 
@@ -173,7 +172,7 @@ function plot_xy(destination, datasets, options) {
   }
 
   var valueline = function(xa, ya, xscale, yscale){
-    return d3.svg.line()
+    return d3.line()
       .x(function(d,i) { return xscale(xa[i]); })
       .y(function(d,i) { return yscale(ya[i]); })
     (Array(xa.length));
@@ -263,6 +262,7 @@ function plot_xy(destination, datasets, options) {
         .attr("d", valueline(x.domain(), [d,d], x,y));
     });
   }
+
   if ("ax2hlines" in options) {
     var ax2hline_color = options.ax2hline_color || i+color_index;
         options.ax2hlines.forEach(function (d,i) {

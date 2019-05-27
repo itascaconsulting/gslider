@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <!-- <link rel="stylesheet" href="./styles.css" /> -->
-    <!-- <link rel="stylesheet" href="./plotstyle.css"> -->
-    <!-- <link rel="stylesheet" type="text/css" href="./d3.slider.css" media="screen" /> -->
+      <style> .line {fill: none; stroke-width: 2.5px;} </style>
   </head>
   <body>
       <section id="logo">
@@ -17,12 +15,13 @@
     <script src="./d3.v5.min.js" charset="utf-8"></script>
     <script src="./d3-simple-slider.js" charset="utf-8"></script>
     <script src="./Itasca_slider.js" charset="utf-8"></script>
-    <script src="./numjs.min.js" charset="utf-8"></script>
+    <!-- <script src="./numjs.min.js" charset="utf-8"></script> -->
+    <script src="https://cdn.jsdelivr.net/gh/nicolaspanel/numjs@0.15.1/dist/numjs.min.js"></script>
     <script>
 
      var my_app = Itasca_slider_app();
      my_app.add_float_slider("#inputs", "A", "Amplitude", 1, 0.1, 10);
-     my_app.add_float_slider("#inputs", "f", "Frequency", 1, 0.1, 10);
+     my_app.add_float_slider("#inputs", "f", "Frequency", 4, 0.1, 10);
      my_app.add_float_slider("#inputs", "p", "Phase", 0, 0, 2*Math.PI);
      my_app.add_radio_buttons("#inputs", "ftype", "Function", ["Sine",
                                                                "Cosine"], "Sine");
@@ -32,12 +31,17 @@
      function my_callback(data) {
 
          var n = 200,
-             x = nj.arange(0,n);
-         x = 2*Math.PI*x/(n);
-         var y = nj.sin(x);
-         plot_xy("#results", [x,y]);
-
-         console.log(x);
+             x = [],
+             y = [];
+         for (var i=0; i<n; i++) {
+             var lx = i/(n+0)*4*Math.PI;
+             x.push(lx);
+             var func = data.ftype === "Sine" ? Math.sin : Math.cos;
+             var ly = data.A*func(data.f*lx+data.p)
+             if (data.damping) ly = Math.exp(-lx/10)*ly;
+             y.push(ly);
+         }
+         plot_xy("#results", [[x, y]]);
          console.log("in my callback");
          console.log(data);
 
