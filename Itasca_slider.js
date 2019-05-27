@@ -120,8 +120,7 @@ var Itasca_slider_app = (function (controls) {
       .attr("name", short_name)
       .attr("value", short_name)
       .on("change", internal_callback);
-    if (checked) { input.property("checked",""); }
-    // how do we check if the checkbox is checked.
+    if (checked) { input.attr("checked",""); }
     getters_[short_name] = function () { return input.property("checked") ? true : false; };
   };
 
