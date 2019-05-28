@@ -29,9 +29,7 @@
      my_app.add_check_box("#inputs", "damping", "Damping", true);
 
      function my_callback(data) {
-         var n = 200,
-             x = [],
-             y = [];
+         var n = 200, x = [], y = [];
          for (var i=0; i<n; i++) {
              var lx = i/(n+0)*4*Math.PI,
                  func = data.ftype === "Sine" ? Math.sin : Math.cos,
@@ -42,7 +40,6 @@
          }
          plot_xy("#results", [[x, y]], options={legend: [data.ftype]});
      }
-
      my_app.add_callback(my_callback);
     </script>
   </body>
