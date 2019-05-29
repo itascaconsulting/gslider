@@ -1,3 +1,11 @@
+# Clever-Name: Interactive web-based calculations with sliders and instant results plotting
+
+
+![Demo](https://octodex.github.com/images/yaktocat.png)
+
+## Example
+
+html```
 <!DOCTYPE html>
 <html>
   <head>
@@ -13,8 +21,8 @@
           <div id="inputs"></div> <div id="results"></div>
       </div>
 
-    <script src="./d3.v5.min.js" charset="utf-8"></script>
-    <script src="./d3-simple-slider.js" charset="utf-8"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://unpkg.com/d3-simple-slider"></script>
     <script src="./Itasca_slider.js" charset="utf-8"></script>
     <script>
      var my_app = Itasca_slider_app();
@@ -40,3 +48,6 @@
     </script>
   </body>
 </html>
+```
+
+## Documentation
