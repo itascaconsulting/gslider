@@ -1,7 +1,7 @@
 # Clever-Name: Interactive web-based calculations with sliders and instant results plotting
 
 
-![Demo](https://octodex.github.com/images/yaktocat.png)
+![Demo](./demo.gif)
 
 ## Example
 
