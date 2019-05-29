@@ -5,7 +5,7 @@
 
 ## Example
 
-html```
+```html
 <!DOCTYPE html>
 <html>
   <head>
@@ -51,3 +51,16 @@ html```
 ```
 
 ## Documentation
+
+Create an application object: `var my_app = Itasca_slider_app();`
+
+This object has the following methods:
+
+`add_float_slider(selector, short_name, long_name, starting_value,
+min, max)`
+
+`add_radio_buttons(selector, short_name, long_name, button_names, starting_value)`
+
+`add_check_box(selector, short_name, long_name, starting_value)`
+
+`plot_xy(data_sets, options)`
