@@ -1,4 +1,4 @@
-# SliderWeb: Interactive web-based calculations with sliders and instant results plotting
+# SlidenPlot: Interactive web-based calculations with sliders and instant results plotting
 
 
 ![Demo](./demo.gif)
@@ -23,9 +23,9 @@
 
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://unpkg.com/d3-simple-slider"></script>
-    <script src="./sliderweb.js" charset="utf-8"></script>
+    <script src="./slidenplot.js" charset="utf-8"></script>
     <script>
-     var my_app = SliderWeb();
+     var my_app = SlidenPlotApp();
      my_app.add_float_slider("#inputs", "A", "Amplitude", 1, 0.1, 10);
      my_app.add_float_slider("#inputs", "f", "Frequency", 2, 0.1, 10);
      my_app.add_float_slider("#inputs", "p", "Phase", 0, 0, 2*Math.PI);

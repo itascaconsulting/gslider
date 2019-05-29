@@ -1,7 +1,7 @@
 // in the slider the input box shoud be authoritative
 // ensure a valid value in input box when focus leaves?
 
-var SliderWeb = (function (controls) {
+var SlidenPlotApp = (function (controls) {
   var getters_ = {},
       user_callback = undefined,
       expFormat = d3.format(".3e");
@@ -78,10 +78,13 @@ var SliderWeb = (function (controls) {
 
     input_box.on("keyup",function (e, b) {
       var codes = [48,49,50,51,52,53,54,55,56,57,0,8,
-                   46,16,38,40];
+                   46,16,38,40,187,189,190];
+      // 187 is +, 189 is -, 190 is . 107,109 are numpad +,-
+      // 108 is numpad .
       // 96-105 are the keypad digits
       // 48-57 is [0-9] 69: e 16:E 8: backspace 46:delete
       // right: 39 left: 37 up: 38 down: 40
+      // see: https://keycode.info/
       if (codes.includes(d3.event.keyCode) ||
           (d3.event.keyCode >=96 && d3.event.keyCode <=105)) {
         var newValue = parseFloat(input_box.property('value'));
