@@ -136,7 +136,8 @@ var SlidenPlotApp = (function (controls) {
     add_float_slider: add_float_slider,
     add_radio_buttons: add_radio_buttons,
     add_check_box: add_check_box,
-    add_callback: add_callback
+    add_callback: add_callback,
+    get_values: get_values
   };
 });
 

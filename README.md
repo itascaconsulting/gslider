@@ -1,5 +1,7 @@
 # SlidenPlot: Interactive web-based calculations with sliders and instant results plotting
 
+A Javascript library to create single page web applications with interactive inputs and instant result plotting. The library depends on `D3` and `d3-simple-slider`.
+
 
 ![Demo](./demo.gif)
 
@@ -50,17 +52,39 @@
 </html>
 ```
 
-## Documentation
+## API Documentation
 
-Create an application object: `var my_app = SliderWeb();`
+Create an application object: `var my_app = SlidenPlotApp();`
 
 This object has the following methods:
 
-`add_float_slider(selector, short_name, long_name, starting_value,
-min, max)`
+`add_float_slider(selector, short_name, long_name, starting_value, min, max)`
+
+Add a floating point slider and a connected input box to the HTML element given by `selector`. `short_name` is used to access the values, `long_name` is used as the input label, `starting_value` gives the initial value of the slider, `min` and `max` are the limits of the sliders. Moving the slider updates the input box and vice versa. The input box allows for more decimal places and is treated as the authoritative value. Only floating point values equal to `min` or `max` or between `min` and `max` are accepted in the input box. 
 
 `add_radio_buttons(selector, short_name, long_name, button_names, starting_value)`
 
+Add a set of radio buttons to the html element given by `selector`. `short_name` is used to access the values, `long_name` is used as the input label, `button_names` is an array of strings giving the button names. The button names are also used as the input value. `starting_value` can be the value of one of the buttons to make that button initially selected. 
+
 `add_check_box(selector, short_name, long_name, starting_value)`
 
-`plot_xy(data_sets, options)`
+
+
+`add_callback(callable)`
+
+Register a user written function to be called when the value of any input changes. The function should take a single value as an argument. When this function is called the argument is an object with key names given by the short name of the inputs and the values are the current value of the input.  
+
+`get_values()`
+
+Return the values of the inputs as an object where the properties are the short_names of the inputs and the values are the current values of the inputs. This function is automatically called before the user specified callback function is invoked. It is not typically necessary to call this function but it is available for testing. 
+
+
+`plot_xy(selector, data_sets, options)`
+ 
+Add a two dimensional plot to the HTML element given by `selector`. `data_sets` should be an array of arrays of x and y value arrays. The `options` argument can have the following properties:
+
+`legend`: an array of strings giving the name of each data_set. A color marker and the data_set name are written to the same HTML element as the plot.
+`x_label`: a label for the x axis.
+`y_label`: a label for the y axis.
+`colors`: a `d3` ordinal scale that returns colors. Each data set is given a color according to this scale. The default is `d3.schemeCategory10`.
+`color_index`: The starting index into `colors`. The default is 0.
