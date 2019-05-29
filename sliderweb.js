@@ -1,7 +1,7 @@
 // in the slider the input box shoud be authoritative
 // ensure a valid value in input box when focus leaves?
 
-var Itasca_slider_app = (function (controls) {
+var SliderWeb = (function (controls) {
   var getters_ = {},
       user_callback = undefined,
       expFormat = d3.format(".3e");
