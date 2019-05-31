@@ -106,16 +106,21 @@ optional `options` argument can have the following properties:
  - `legend`: an array of strings giving the name of each data_set. A
    color marker and the data_set name are written to the same HTML
    element as the plot.
+ - `grid`: add an x,y grid to the plot.
 
 A second y-axis, on the right-side of the plot, can be added by
 specifying these properties in the `options` argument:
 
- - `y2_label`: a label for the right-side y axis.
  - `right_y_scale`: if this factor is given a right-side y-axis is
    rendered scaled by this factor relative to the left-side y-axis.
+   Only one of `right_y_scale` or `right_data` can be specified in a
+   given plot.
  - `right_data`: data sets to plot on the right-side y-axis. The
-   format is the same as `data_sets`.
+   format is the same as `data_sets`. Only one of `right_y_scale` or
+   `right_data` can be specified in a given plot.
+ - `y2_label`: a label for the right-side y axis.
  - `y2min` and `y2max`: the limits of the right-side y-axis. If this
    is omitted the scale is determined automatically.
  - `ax2hlines`: an array of y-values giving locations to plot
    horizontal lines on the right-side y axis.
+ - `ax2hline_color`: a color index for the horizontal line.

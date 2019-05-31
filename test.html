@@ -25,7 +25,7 @@
      my_app.add_check_box("#inputs", "damping", "Damping", true);
 
      function my_callback(data) {
-         var n = 200, x = [], y = [];
+         var n = 200, x = [], y = [], y2 = [];
          for (var i=0; i<n; i++) {
              var lx = i/(n+0)*4*Math.PI,
                  func = data.ftype === "Sine" ? Math.sin : Math.cos,
@@ -33,12 +33,22 @@
              if (data.damping) ly = Math.exp(-lx/10)*ly;
              x.push(lx);
              y.push(ly);
+             y2.push(10*ly/(lx+1))
          }
          plot_xy("#results", [[x, y]],
                  options={ legend: [data.ftype],
                            title: "Sample Plot",
                            x_label: "Time [s]",
-                           y_label: "Pressure [Pa]"});
+                           y_label: "Pressure [Pa]",
+                           //right_y_scale: 10,
+                           grid: true,
+                           right_data: [[x,y2]],
+                           y2_label: "Hi mom",
+                           axhlines: [-0.5, 0.5],
+                           axvlines: [2.2, 3.3],
+                           ax2hlines: [0],
+                           ax2hline_color: 3,
+                 });
      }
      my_app.add_callback(my_callback);
     </script>

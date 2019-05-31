@@ -160,17 +160,18 @@ function plot_xy(destination, datasets, options) {
   var     y2 = d3.scaleLinear().range([height, 0]);
 
   var xAxis = d3.axisBottom().scale(x)
-      .tickSizeInner(-height)
       .ticks(5);
   var yAxis = d3.axisLeft().scale(y)
-      .tickSizeInner(-width)
       .ticks(5)
       .tickFormat(d3.format(".1e"));
+  if (options.grid) {
+    xAxis.tickSizeInner(-height);
+    yAxis.tickSizeInner(-width);
+  }
 
   var yAxis_right = undefined;
   if (("right_y_scale" in options) || ("right_data" in options)) {
-    yAxis_right =  d3.svg.axis().scale(y2)
-      .orient("right")
+    yAxis_right =  d3.axisRight().scale(y2)
       .ticks(5)
       .tickFormat(d3.format(".1e"));
   }
@@ -268,8 +269,8 @@ function plot_xy(destination, datasets, options) {
   }
 
   if ("ax2hlines" in options) {
-    var ax2hline_color = options.ax2hline_color || i+color_index;
-        options.ax2hlines.forEach(function (d,i) {
+    options.ax2hlines.forEach(function (d,i) {
+      var ax2hline_color = options.ax2hline_color || (i+color_index);
       chart1.append("path")
         .attr("class", "horizontal_line")
         .attr("stroke", colors((ax2hline_color)%10))
