@@ -10,6 +10,8 @@ interactive inputs and instant result plotting. The library depends on
 
 ## Example
 
+[Live demo](https://s3.us-east-2.amazonaws.com/icgprojects/2857-16/slidenplot_demo.html)
+
 ```html
 <!DOCTYPE html>
 <html>
