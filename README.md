@@ -14,21 +14,21 @@ interactive inputs and instant result plotting. The library depends on
 <!DOCTYPE html>
 <html>
   <head>
-      <style>
-       .line {fill: none; stroke-width: 2.5px;}
-       .flex-container {display: flex; flex-wrap: nowrap;}
-      </style>
+    <style>
+     .line {fill: none; stroke-width: 2.5px;}
+     .flex-container {display: flex; flex-wrap: nowrap;}
+    </style>
   </head>
   <body>
-        <p><em>Example slider application</em></p>
-      <hr>
-      <div class="flex-container">
-          <div id="inputs"></div> <div id="results"></div>
-      </div>
+    <p><em>Example slider application</em></p>
+    <hr>
+    <div class="flex-container">
+      <div id="inputs"></div> <div id="results"></div>
+    </div>
 
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://unpkg.com/d3-simple-slider"></script>
-    <script src="./slidenplot.js" charset="utf-8"></script>
+    <script src="https://s3.us-east-2.amazonaws.com/icgprojects/2857-16/slidenplot.js" charset="utf-8"></script>
     <script>
      var my_app = SlidenPlotApp();
      my_app.add_float_slider("#inputs", "A", "Amplitude", 1, 0.1, 10);
@@ -38,16 +38,20 @@ interactive inputs and instant result plotting. The library depends on
      my_app.add_check_box("#inputs", "damping", "Damping", true);
 
      function my_callback(data) {
-         var n = 200, x = [], y = [];
-         for (var i=0; i<n; i++) {
-             var lx = i/(n+0)*4*Math.PI,
-                 func = data.ftype === "Sine" ? Math.sin : Math.cos,
-                 ly = data.A*func(data.f*lx+data.p);
-             if (data.damping) ly = Math.exp(-lx/10)*ly;
-             x.push(lx);
-             y.push(ly);
-         }
-         plot_xy("#results", [[x, y]], options={legend: [data.ftype]});
+       var n = 200, x = [], y = [];
+       for (var i=0; i<n; i++) {
+         var lx = i/(n+0)*4*Math.PI,
+           func = data.ftype === "Sine" ? Math.sin : Math.cos,
+           ly = data.A*func(data.f*lx+data.p);
+         if (data.damping) ly = Math.exp(-lx/10)*ly;
+         x.push(lx);
+         y.push(ly);
+       }
+       plot_xy("#results", [[x, y]],
+           options={ legend: [data.ftype],
+                title: "Sample Plot",
+                x_label: "Time [s]",
+                y_label: "Pressure [Pa]"});
      }
      my_app.add_callback(my_callback);
     </script>
@@ -56,6 +60,7 @@ interactive inputs and instant result plotting. The library depends on
 ```
 
 ## API Documentation
+### SlidenPlotApp object
 
 Create an application object: `var my_app = SlidenPlotApp();`
 
@@ -83,6 +88,9 @@ Register a user written function to be called when the value of any input change
 
 Return the values of the inputs as an object where the properties are the short_names of the inputs and the values are the current values of the inputs. This function is automatically called before the user specified callback function is invoked. It is not typically necessary to call this function but it is available for testing.
 
+### Plotting
+The `plot_xy` function is provided to simplify
+creating x,y plots with [d3](https://d3js.org).
 
 `plot_xy(selector, data_sets, options)`
 
