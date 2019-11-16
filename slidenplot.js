@@ -155,7 +155,12 @@ function plot_xy(destination, datasets, options) {
   var margin = {top: 30, right: 80, bottom: 40, left: 80},
       width = 400 - margin.left - margin.right,
       height = 220 - margin.top - margin.bottom;
-  var     x = d3.scaleLinear().range([0, width]);
+  var     x;
+  if (options.logx) {
+      x = d3.scaleLog().range([0, width]);
+  } else {
+      x = d3.scaleLinear().range([0, width]);
+  }
   var     y = d3.scaleLinear().range([height, 0]);
   var     y2 = d3.scaleLinear().range([height, 0]);
 
