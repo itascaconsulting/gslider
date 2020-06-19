@@ -72,6 +72,7 @@ var SlidenPlotApp = (function (controls) {
       if (newValue) {
         if (newValue <= max && newValue >= min) {
           slider.value(newValue);
+          internal_callback() // slider.value() is bugged and does not invoke onchange listener
         }
       }
     });
@@ -91,6 +92,7 @@ var SlidenPlotApp = (function (controls) {
         if (newValue) {
           if (newValue <= max && newValue >= min) {
             slider.value(newValue);
+            internal_callback() // slider.value() is bugged and does not invoke onchange listener
           }
         }
       };
