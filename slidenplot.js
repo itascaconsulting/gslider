@@ -95,7 +95,7 @@ var SlidenPlotApp = (function (controls) {
             internal_callback() // slider.value() is bugged and does not invoke onchange listener
           }
         }
-      };
+      }
     });
   };
 
@@ -126,7 +126,7 @@ var SlidenPlotApp = (function (controls) {
       .attr("value", short_name)
       .on("change", internal_callback);
     if (checked) { input.attr("checked",""); }
-    getters_[short_name] = function () { return input.property("checked") ? true : false; };
+    getters_[short_name] = function () { return !!input.property("checked"); };
   };
 
   var add_callback = function (callback) {
@@ -174,6 +174,7 @@ function plot_xy(destination, datasets, options) {
 
   // If using a log-x scale, domain must be strictly positive or strictly negative (0 excluded)
   // If domain does not fulfill these requirements, use a linear scale instead
+  if (typeof Math.sign === 'undefined') { Math.sign = function (x) { return x > 0 ? 1 : x < 0 ? -1 : x; } }
   if (!options.logx || !(Math.sign(xmin_use) === Math.sign(xmax_use) && xmin_use !== 0 && xmax_use !== 0)) {
      x = d3.scaleLinear()
            .domain([xmin_use, xmax_use])
@@ -285,8 +286,8 @@ function plot_xy(destination, datasets, options) {
     .text(y2_label);
 
   datasets.forEach(function (d, i) {
-    xarray = d[0];
-    yarray = d[1];
+    let xarray = d[0];
+    let yarray = d[1];
     chart1.append("path")
       .attr("class", "line")
       .attr("stroke", colors((i+color_index)%10))
@@ -303,8 +304,8 @@ function plot_xy(destination, datasets, options) {
     y2.domain([y2min_use,y2max_use]);
 
     options.right_data.forEach(function (d, i) {
-      xarray = d[0];
-      yarray = d[1];
+      let xarray = d[0];
+      let yarray = d[1];
       chart1.append("path")
         .attr("class", "line")
         .attr("stroke", colors((i+color_offset)%10))
