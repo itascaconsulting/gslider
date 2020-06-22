@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <style>
+       .line {fill: none; stroke-width: 2.5px;}
+       .flex-container {display: flex; flex-wrap: nowrap;}
+      </style>
+  </head>
+  <body>
+        <p><em>Example slider application</em></p>
+      <hr>
+      <div class="flex-container">
+          <div id="inputs"></div> <div id="results"></div>
+      </div>
+
+    <script src="./d3.v5.min.js" charset="utf-8"></script>
+    <script src="./d3-simple-slider.js" charset="utf-8"></script>
+    <script src="./slidenplot.js" charset="utf-8"></script>
+    <script>
+     var my_app = SlidenPlotApp();
+     my_app.add_radio_buttons("#inputs", "ftype", "Function", ["y = x", "y = 10^x", "y = log(x)"], "y = x")
+     my_app.add_check_box("#inputs", "logy", "Log y axis", false);
+     my_app.add_check_box("#inputs", "logx", "Log x axis", false);
+
+     my_app.add_float_slider("#inputs", "width", "Plot Width", 400, 200, 2000)
+     my_app.add_float_slider("#inputs", "height", "Plot Height", 200, 100, 1000)
+
+     my_app.add_float_slider("#inputs", "title_size", "Title Size", 15, 5, 50)
+     my_app.add_float_slider("#inputs", "label_size", "Label Size", 15, 5, 40)
+     my_app.add_float_slider("#inputs", "axes_size", "Axes Size", 10, 5, 30)
+
+
+
+     function my_callback(data) {
+         var n = 100, x = [], y = [], y2 = [];
+         // x_max inclusive, x_min exclusive
+         let x_max, x_min;
+         if (data.ftype === "y = log(x)") {
+             x_max = 100
+             x_min = 1
+         } else if (data.ftype === "y = 10^x") {
+             x_max = 2
+             x_min = 0
+         } else {
+             x_max = 100
+             x_min = 1
+         }
+         for (var i = n * x_min / x_max; i <= n; i++) {
+             var lx = i/n * x_max;
+             var ly;
+             if (data.ftype === "y = x") {
+                 ly = lx;
+             }  else if (data.ftype === "y = 10^x") {
+                 ly = 10**lx;
+             } else {
+                 ly = Math.log10(lx);
+             }
+             x.push(lx);
+             y.push(ly);
+         }
+         x.shift()
+         y.shift()
+         plot_xy("#results", [[x, y]],
+                 options={ legend: [data.ftype],
+                           title: "Sample Plot",
+                           x_label: "Time [s]",
+                           y_label: "Pressure [Pa]",
+                           grid: true,
+                           logx: data.logx,
+                           logy: data.logy,
+                           width: data.width,
+                           height: data.height,
+                           title_size: data.title_size,
+                           margin: {top: 60, right: 80, bottom: 60, left: 80},
+                           axes_size: data.axes_size,
+                           label_size: data.label_size
+                 });
+     }
+     my_app.add_callback(my_callback);
+    </script>
+  </body>
+</html>
