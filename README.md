@@ -117,6 +117,14 @@ optional `options` argument can have the following properties:
    color marker and the data_set name are written to the same HTML
    element as the plot.
  - `grid`: add an x,y grid to the plot.
+ - `logx`: whether to scale the x-axis logarithmically
+ - `logy`: whether to scale the y-axis logarithmically
+ - `width`: width of the plot
+ - `height`: height of the plot
+ - `title_size`: font size of the title
+ - `axes_size`: font size of axes' ticks
+ - `label_size`: font size of the labels for the axes
+ - `margin`: a dictionary mapping `top`, `right`, `bottom`, and `left` to their respective paddings
 
 A second y-axis, on the right-side of the plot, can be added by
 specifying these properties in the `options` argument:
