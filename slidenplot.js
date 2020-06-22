@@ -154,26 +154,87 @@ function plot_xy(destination, datasets, options) {
   var y2_label = options.y2_label || "";
   var title = options.title || "";
 
-  var margin = {top: 30, right: 80, bottom: 40, left: 80},
-      width = 400 - margin.left - margin.right,
-      height = 220 - margin.top - margin.bottom;
-  var     x;
-  if (options.logx) {
-      x = d3.scaleLog().range([0, width]);
+  var margin = "margin" in options ? options.margin : {top: 30, right: 80, bottom: 40, left: 80},
+      width = ("width" in options ? options.width : 400) - margin.left - margin.right,
+      height = ("height" in options ? options.height : 200) - margin.top - margin.bottom;
+
+  var xmin = d3.min(datasets.map(function (d) { return d3.min(d[0]);}));
+  var xmax = d3.max(datasets.map(function (d) { return d3.max(d[0]);}));
+  var ymin = d3.min(datasets.map(function (d) { return d3.min(d[1]);}));
+  var ymax = d3.max(datasets.map(function (d) { return d3.max(d[1]);}));
+
+  var xmin_use = "xmin" in options ? options.xmin : xmin;
+  var xmax_use = "xmax" in options ? options.xmax : xmax;
+
+  var ymin_use =  "ymin" in options ? options.ymin : ymin;
+  var ymax_use =  "ymax" in options ? options.ymax : ymax;
+
+  // Create scales
+  var x, y, y2;
+
+  // If using a log-x scale, domain must be strictly positive or strictly negative (0 excluded)
+  // If domain does not fulfill these requirements, use a linear scale instead
+  if (!options.logx || !(Math.sign(xmin_use) === Math.sign(xmax_use) && xmin_use !== 0 && xmax_use !== 0)) {
+     x = d3.scaleLinear()
+           .domain([xmin_use, xmax_use])
+           .range([0, width]);
   } else {
-      x = d3.scaleLinear().range([0, width]);
+    x = d3.scaleLog()
+          .domain([xmin_use, xmax_use])
+          .range([0, width]);
   }
-  var     y = d3.scaleLinear().range([height, 0]);
-  var     y2 = d3.scaleLinear().range([height, 0]);
+
+  // If using a log-y scale, domain must be strictly positive or strictly negative (0 excluded)
+  // If domain does not fulfill these requirements, use a linear scale instead
+  if (!options.logy || !(Math.sign(ymin_use) === Math.sign(ymax_use) && ymin_use !== 0 && ymax_use !== 0)) {
+    y = d3.scaleLinear()
+          .domain([ymin_use, ymax_use])
+          .range([height, 0]);
+    y2 = d3.scaleLinear()
+           .range([ymin_use, ymax_use]);
+  } else {
+    y = d3.scaleLog()
+          .domain([ymin_use, ymax_use])
+          .range([height, 0]);
+    y2 = d3.scaleLog()
+           .range([ymin_use, ymax_use]);
+  }
+
+  if ("right_y_scale" in options) {
+    y2.domain([ymin_use*options.right_y_scale,
+               ymax_use*options.right_y_scale]);
+  }
+
+  // tick format for logarithmic axes
+  var log_format = function (d) {
+    if (Number.isInteger(Math.log10(d))) {
+      return d3.format('.1f')(d)
+    } else {
+      return ''
+    }
+  }
+
+  var tick_format_x = options.logx ? log_format: d3.format('.1e');
+  var tick_format_y = options.logy ? log_format: d3.format('.1e');
 
   var xAxis = d3.axisBottom().scale(x)
-      .ticks(5);
+      .ticks(5)
+      .tickFormat(tick_format_x)
+      .tickPadding(6);
   var yAxis = d3.axisLeft().scale(y)
       .ticks(5)
-      .tickFormat(d3.format(".1e"));
+      .tickFormat(tick_format_y)
+      .tickPadding(6)
+
   if (options.grid) {
-    xAxis.tickSizeInner(-height);
-    yAxis.tickSizeInner(-width);
+    var xGrid = d3.axisBottom().scale(x)
+                  .ticks(5)
+                  .tickSizeInner(height)
+                  .tickFormat("");
+    var yGrid = d3.axisLeft().scale(y)
+                  .ticks(5)
+                  .tickSizeInner(-width)
+                  .tickFormat("");
   }
 
   var yAxis_right = undefined;
@@ -190,7 +251,6 @@ function plot_xy(destination, datasets, options) {
     (Array(xa.length));
   };
 
-
   var chart1 = d3.select(destination)
       .append("svg")
       .attr("width", width + margin.left + margin.right)
@@ -201,41 +261,28 @@ function plot_xy(destination, datasets, options) {
 
   chart1.append("text")
     .attr("text-anchor", "middle")
-    .attr("transform", "translate("+ (width/2)+","+(height+margin.bottom/1.5)+")")
+    .attr("transform", "translate("+ (width/2)+","+(height+margin.bottom/1.1)+")") // CHANGED FROM bottom/1.5
+    .attr("style", "font-size:" + ("label_size" in options ? options.label_size : 15) + "px;")
     .text(x_label);
 
   chart1.append("text")
     .attr("text-anchor", "middle")
     .attr("transform", "translate("+ (width/2)+","+(-margin.top/2.5)+")")
-    .attr("style", "font-size:15px; font-weight:bold")
+    .attr("style", "font-size:" + ("title_size" in options ? options.title_size : 15) + "px; font-weight:bold")
     .text(title);
 
   chart1.append("text")
     .attr("text-anchor", "middle")
     .attr("transform",
           "translate("+(-margin.left/1.5)+","+(height/2.0)+")rotate(-90)")
+    .attr("style", "font-size:" + ("label_size" in options ? options.label_size : 15) + "px;")
     .text(y_label);
 
   chart1.append("text")
     .attr("text-anchor", "middle")
     .attr("transform", "translate("+(width + margin.right/1.3)+","+(height/2)+")rotate(-90)")
+    .attr("style", "font-size:" + ("label_size" in options ? options.label_size : 15) + "px;")
     .text(y2_label);
-
-  var xmin = d3.min(datasets.map(function (d) { return d3.min(d[0]);}));
-  var xmax = d3.max(datasets.map(function (d) { return d3.max(d[0]);}));
-  var ymin = d3.min(datasets.map(function (d) { return d3.min(d[1]);}));
-  var ymax = d3.max(datasets.map(function (d) { return d3.max(d[1]);}));
-
-  var xmin_use = "xmin" in options ? options.xmin : xmin;
-  var xmax_use = "xmax" in options ? options.xmax : xmax;
-  x.domain([xmin_use,xmax_use]);
-  var ymin_use =  "ymin" in options ? options.ymin : ymin;
-  var ymax_use =  "ymax" in options ? options.ymax : ymax;
-  y.domain([ymin_use,ymax_use]);
-  if ("right_y_scale" in options) {
-    y2.domain([ymin_use*options.right_y_scale,
-               ymax_use*options.right_y_scale]);
-  }
 
   datasets.forEach(function (d, i) {
     xarray = d[0];
@@ -244,7 +291,6 @@ function plot_xy(destination, datasets, options) {
       .attr("class", "line")
       .attr("stroke", colors((i+color_index)%10))
       .attr("d", valueline(xarray, yarray, x, y));
-
   });
 
   var color_offset = datasets.length + color_index;
@@ -301,6 +347,57 @@ function plot_xy(destination, datasets, options) {
   chart1.append("g")
     .attr("class", "y axis")
     .call(yAxis);
+
+  chart1.selectAll(".tick text")
+    .attr("font-size", ("axes_size" in options ? options.axes_size : 10));
+
+  if (options.logy && options.grid) {
+    chart1.selectAll("g.y.axis g.tick line")
+      .attr("x2", width)
+      .attr("stroke", "#808080")
+      .attr("opacity", function (d) {
+        if (Number.isInteger(Math.log10(d))) return 1;
+        else return .8;
+      })
+      .attr("stroke-dasharray", function (d) {
+        if (Number.isInteger(Math.log10(d))) return 0;
+        else return 2;
+    })
+  } else if (options.grid) {
+    chart1.selectAll("g.y.axis g.tick line")
+      .attr("x2", width)
+      .attr("stroke", "#808080")
+  } else if (options.logy) {
+    chart1.selectAll("g.y.axis g.tick line")
+      .attr("x2", function (d) {
+        if (Number.isInteger(Math.log10(d))) return -10;
+        else return -4;
+      })
+  }
+
+  if (options.logx && options.grid) {
+    chart1.selectAll("g.x.axis g.tick line")
+      .attr("y2", -height)
+      .attr("stroke", "#808080")
+      .attr("opacity", function (d) {
+        if (Number.isInteger(Math.log10(d))) return 1;
+        else return .8;
+      })
+      .attr("stroke-dasharray", function (d) {
+        if (Number.isInteger(Math.log10(d))) return 0;
+        else return 2;
+    })
+  } else if (options.grid) {
+    chart1.selectAll("g.x.axis g.tick line")
+      .attr("y2", -height)
+      .attr("stroke", "#808080")
+  } else if (options.logx) {
+    chart1.selectAll("g.x.axis g.tick line")
+      .attr("y2", function (d) {
+        if (Number.isInteger(Math.log10(d))) return 10;
+        else return 4;
+      })
+  }
 
   if ("right_y_scale" in options || "right_data" in options) {
     chart1.append("g")
