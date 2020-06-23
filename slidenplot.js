@@ -158,6 +158,10 @@ function plot_xy(destination, datasets, options) {
       width = ("width" in options ? options.width : 400) - margin.left - margin.right,
       height = ("height" in options ? options.height : 200) - margin.top - margin.bottom;
 
+  var margin = "margin" in options ? options.margin : {top: 30, right: 80, bottom: 40, left: 80},
+      width = ("width" in options ? options.width : 400) - margin.left - margin.right,
+      height = ("height" in options ? options.height : 200) - margin.top - margin.bottom;
+
   var xmin = d3.min(datasets.map(function (d) { return d3.min(d[0]);}));
   var xmax = d3.max(datasets.map(function (d) { return d3.max(d[0]);}));
   var ymin = d3.min(datasets.map(function (d) { return d3.min(d[1]);}));
@@ -174,7 +178,6 @@ function plot_xy(destination, datasets, options) {
 
   // If using a log-x scale, domain must be strictly positive or strictly negative (0 excluded)
   // If domain does not fulfill these requirements, use a linear scale instead
-  if (typeof Math.sign === 'undefined') { Math.sign = function (x) { return x > 0 ? 1 : x < 0 ? -1 : x; } }
   if (!options.logx || !(Math.sign(xmin_use) === Math.sign(xmax_use) && xmin_use !== 0 && xmax_use !== 0)) {
      x = d3.scaleLinear()
            .domain([xmin_use, xmax_use])
@@ -206,17 +209,19 @@ function plot_xy(destination, datasets, options) {
                ymax_use*options.right_y_scale]);
   }
 
+  var tick_format = d3.format('.1e');
+
   // tick format for logarithmic axes
   var log_format = function (d) {
     if (Number.isInteger(Math.log10(d))) {
-      return d3.format('.1f')(d)
+      return tick_format(d)
     } else {
       return ''
     }
   }
 
-  var tick_format_x = options.logx ? log_format: d3.format('.1e');
-  var tick_format_y = options.logy ? log_format: d3.format('.1e');
+  var tick_format_x = options.logx ? log_format: tick_format;
+  var tick_format_y = options.logy ? log_format: tick_format;
 
   var xAxis = d3.axisBottom().scale(x)
       .ticks(5)
@@ -227,22 +232,12 @@ function plot_xy(destination, datasets, options) {
       .tickFormat(tick_format_y)
       .tickPadding(6)
 
-  if (options.grid) {
-    var xGrid = d3.axisBottom().scale(x)
-                  .ticks(5)
-                  .tickSizeInner(height)
-                  .tickFormat("");
-    var yGrid = d3.axisLeft().scale(y)
-                  .ticks(5)
-                  .tickSizeInner(-width)
-                  .tickFormat("");
-  }
-
   var yAxis_right = undefined;
   if (("right_y_scale" in options) || ("right_data" in options)) {
     yAxis_right =  d3.axisRight().scale(y2)
       .ticks(5)
-      .tickFormat(d3.format(".1e"));
+      .tickFormat(tick_format_y)
+      .tickPadding(6);
   }
 
   var valueline = function(xa, ya, xscale, yscale){
@@ -262,7 +257,7 @@ function plot_xy(destination, datasets, options) {
 
   chart1.append("text")
     .attr("text-anchor", "middle")
-    .attr("transform", "translate("+ (width/2)+","+(height+margin.bottom/1.1)+")") // CHANGED FROM bottom/1.5
+    .attr("transform", "translate("+ (width/2)+","+(height+margin.bottom/1.5)+")")
     .attr("style", "font-size:" + ("label_size" in options ? options.label_size : 15) + "px;")
     .text(x_label);
 
@@ -356,12 +351,12 @@ function plot_xy(destination, datasets, options) {
     chart1.selectAll("g.y.axis g.tick line")
       .attr("x2", width)
       .attr("stroke", "#808080")
-      .attr("opacity", function (d) {
-        if (Number.isInteger(Math.log10(d))) return 1;
+      .attr("opacity", function (x) {
+        if (Number.isInteger(Math.log10(x))) return 1;
         else return .8;
       })
-      .attr("stroke-dasharray", function (d) {
-        if (Number.isInteger(Math.log10(d))) return 0;
+      .attr("stroke-dasharray", function (x) {
+        if (Number.isInteger(Math.log10(x))) return 0;
         else return 2;
     })
   } else if (options.grid) {
@@ -370,8 +365,8 @@ function plot_xy(destination, datasets, options) {
       .attr("stroke", "#808080")
   } else if (options.logy) {
     chart1.selectAll("g.y.axis g.tick line")
-      .attr("x2", function (d) {
-        if (Number.isInteger(Math.log10(d))) return -10;
+      .attr("x2", function (x) {
+        if (Number.isInteger(Math.log10(x))) return -10;
         else return -4;
       })
   }
@@ -380,12 +375,12 @@ function plot_xy(destination, datasets, options) {
     chart1.selectAll("g.x.axis g.tick line")
       .attr("y2", -height)
       .attr("stroke", "#808080")
-      .attr("opacity", function (d) {
-        if (Number.isInteger(Math.log10(d))) return 1;
+      .attr("opacity", function (x) {
+        if (Number.isInteger(Math.log10(x))) return 1;
         else return .8;
       })
-      .attr("stroke-dasharray", function (d) {
-        if (Number.isInteger(Math.log10(d))) return 0;
+      .attr("stroke-dasharray", function (x) {
+        if (Number.isInteger(Math.log10(x))) return 0;
         else return 2;
     })
   } else if (options.grid) {
@@ -394,8 +389,8 @@ function plot_xy(destination, datasets, options) {
       .attr("stroke", "#808080")
   } else if (options.logx) {
     chart1.selectAll("g.x.axis g.tick line")
-      .attr("y2", function (d) {
-        if (Number.isInteger(Math.log10(d))) return 10;
+      .attr("y2", function (x) {
+        if (Number.isInteger(Math.log10(x))) return 10;
         else return 4;
       })
   }
