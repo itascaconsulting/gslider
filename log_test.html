@@ -2,7 +2,7 @@
 <html>
   <head>
       <style>
-       .line {fill: none; stroke-width: 2.5px;}
+       .line {fill: none; stroke-width: 3px;}
        .flex-container {display: flex; flex-wrap: nowrap;}
       </style>
   </head>
@@ -21,6 +21,7 @@
      my_app.add_radio_buttons("#inputs", "ftype", "Function", ["y = x", "y = 10^x", "y = log(x)"], "y = x")
      my_app.add_check_box("#inputs", "logy", "Log y axis", false);
      my_app.add_check_box("#inputs", "logx", "Log x axis", false);
+     my_app.add_check_box("#inputs", "grid", "Show Grid", true);
 
      my_app.add_float_slider("#inputs", "width", "Plot Width", 400, 200, 2000)
      my_app.add_float_slider("#inputs", "height", "Plot Height", 200, 100, 1000)
@@ -51,27 +52,28 @@
              if (data.ftype === "y = x") {
                  ly = lx;
              }  else if (data.ftype === "y = 10^x") {
-                 ly = 10**lx;
+                 ly = Math.pow(10, lx);
              } else {
-                 ly = Math.log10(lx);
+                 ly = Math.log(lx) * Math.LOG10E;
              }
              x.push(lx);
              y.push(ly);
          }
-         x.shift()
-         y.shift()
+         x.shift();
+         y.shift();
+         var options;
          plot_xy("#results", [[x, y]],
                  options={ legend: [data.ftype],
                            title: "Sample Plot",
                            x_label: "Time [s]",
                            y_label: "Pressure [Pa]",
-                           grid: true,
+                           grid: data.grid,
                            logx: data.logx,
                            logy: data.logy,
                            width: data.width,
                            height: data.height,
                            title_size: data.title_size,
-                           margin: {top: 60, right: 80, bottom: 60, left: 80},
+                           margin: {top: 60, right: 40, bottom: 60, left: 120},
                            axes_size: data.axes_size,
                            label_size: data.label_size
                  });
