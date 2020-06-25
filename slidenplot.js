@@ -195,13 +195,13 @@ function plot_xy(destination, datasets, options) {
           .domain([ymin_use, ymax_use])
           .range([height, 0]);
     y2 = d3.scaleLinear()
-           .range([ymin_use, ymax_use]);
+           .range([height, 0]);
   } else {
     y = d3.scaleLog()
           .domain([ymin_use, ymax_use])
           .range([height, 0]);
     y2 = d3.scaleLog()
-           .range([ymin_use, ymax_use]);
+           .range([height, 0]);
   }
 
   if ("right_y_scale" in options) {
@@ -270,7 +270,7 @@ function plot_xy(destination, datasets, options) {
   chart1.append("text")
     .attr("text-anchor", "middle")
     .attr("transform",
-          "translate("+(-margin.left/1.5)+","+(height/2.0)+")rotate(-90)")
+          "translate("+(-margin.left/1.2)+","+(height/2.0)+")rotate(-90)")
     .attr("style", "font-size:" + ("label_size" in options ? options.label_size : 15) + "px;")
     .text(y_label);
 
@@ -296,7 +296,7 @@ function plot_xy(destination, datasets, options) {
     var y2max = d3.max(options.right_data.map(function (d){return d3.max(d[1]);}));
     var y2min_use =  "y2min" in options ? options.y2min : y2min;
     var y2max_use =  "y2max" in options ? options.y2max : y2max;
-    y2.domain([y2min_use,y2max_use]);
+    y2.domain([y2min_use, y2max_use]);
 
     options.right_data.forEach(function (d, i) {
       let xarray = d[0];
@@ -343,9 +343,6 @@ function plot_xy(destination, datasets, options) {
   chart1.append("g")
     .attr("class", "y axis")
     .call(yAxis);
-
-  chart1.selectAll(".tick text")
-    .attr("font-size", ("axes_size" in options ? options.axes_size : 10));
 
   if (options.logy && options.grid) {
     chart1.selectAll("g.y.axis g.tick line")
@@ -401,6 +398,9 @@ function plot_xy(destination, datasets, options) {
       .attr("transform", "translate(" + width + " ,0)")
       .call(yAxis_right);
   }
+
+  chart1.selectAll(".tick text")
+    .attr("font-size", ("axes_size" in options ? options.axes_size : 10));
 
   if ("legend" in options) {
     options.legend.forEach(function (d,i) {
