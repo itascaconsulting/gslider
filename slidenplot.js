@@ -402,6 +402,17 @@ function plot_xy(destination, datasets, options) {
   chart1.selectAll(".tick text")
     .attr("font-size", ("axes_size" in options ? options.axes_size : 10));
 
+  if ("circles" in options) {
+    let color = "circle_color" in options ? options.circle_color : colors((color_index));
+    options.circles.forEach(function (d,i) {
+      chart1.append("circle")
+          .attr("cx", x(d[0]))
+          .attr("cy", y(d[1]))
+          .attr("r", 10)
+          .attr("fill", color);
+    });
+  }
+
   if ("legend" in options) {
     options.legend.forEach(function (d,i) {
       d3.select(destination)

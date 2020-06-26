@@ -125,6 +125,9 @@ optional `options` argument can have the following properties:
  - `axes_size`: font size of axes' ticks
  - `label_size`: font size of the labels for the axes
  - `margin`: a dictionary mapping `top`, `right`, `bottom`, and `left` to their respective paddings
+ - `circles`: An array of arrays of x and y values. Draws a circle on the plot for each
+ (x, y) point in the array.
+ - `circle_color`: The color of the plotted circles.
 
 A second y-axis, on the right-side of the plot, can be added by
 specifying these properties in the `options` argument:
