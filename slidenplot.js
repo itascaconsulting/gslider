@@ -19,24 +19,31 @@ var SlidenPlotApp = (function (controls) {
     user_callback(get_values());
   };
 
-  var add_float_slider = function(target, short_name, name,
-                                  start, min_, max_) {
+  var add_float_slider = function(target, short_name, name, start,
+                                  min_, max_, options) {
     var min = min_,
         max = max_;
+    options = options || {};
+    let slider_width = options.slider_width || 300,
+        input_width = options.input_width || 100,
+        fill = options.fill === undefined ? null : options.fill,
+        font_size = options.font_size || 12;
     if (!(start >= min)) throw "Start must be greater than or equal to min.";
     if (!(start <= max)) throw "Start must be less than or equal to max.";
     if (!(min < max)) throw  "min must be less than max.";
     d3.select(target)
-      .append('div').text(name);
+      .append('div')
+      .text(name)
+      .attr("style", "font-size: " + font_size + "px");
     var input_box = d3.select(target)
         .append("input")
-        .attr("name", short_name);
+        .attr("name", short_name)
     input_box.attr("type", "number")
       .property('value', d3.format(".6e")(start))
       .property("min", min)
       .property("max", max)
       .property("step", (max - min)/100.0)
-      .attr("size", 60)
+      .attr("style", "width: " + input_width + "px; font-size: " + font_size + "px")
       .attr("data-currentvalue", start);
 
     var formatter = (max < 1e3) ? d3.format("") : d3.format(".1e");
@@ -46,7 +53,8 @@ var SlidenPlotApp = (function (controls) {
         .max(max)
         .step((max-min)/200.0)
         .default(start)
-        .width(300)
+        .width(slider_width)
+        .fill(fill)
         .ticks(5).tickFormat(formatter)
         .displayValue(false)
         .on('onchange.a', function (value)
@@ -99,18 +107,24 @@ var SlidenPlotApp = (function (controls) {
     });
   };
 
-  var add_radio_buttons = function(target, short_name, name, options,
-                                   checked) {
+  var add_radio_buttons = function(target, short_name, name, button_names,
+                                   checked, options) {
+    options = options || {};
+    let font_size = options.font_size || 12;
     d3.select(target)
-      .append('div').text(name);
-    for (var i=0; i<options.length; i++) {
-      d3.select(target).append("div").text(options[i]);
+      .append('div')
+      .text(name)
+      .attr("style", "font-size: " + font_size + "px");
+    for (var i=0; i<button_names.length; i++) {
+      d3.select(target).append("div")
+          .text(button_names[i])
+          .attr("style", "font-size: " + (font_size - 2) + "px");
       var tmp =  d3.select(target).append("input")
           .attr("type", "radio")
           .attr("name", short_name)
-          .attr("value", options[i])
+          .attr("value", button_names[i])
           .on("change", function () { internal_callback(); });
-      if (options[i]===checked) { tmp.attr("checked",""); }
+      if (button_names[i]===checked) { tmp.attr("checked",""); }
     }
     getters_[short_name] = function () {
       return document.querySelector('input[name="'+short_name+'"]:checked').value;
@@ -158,9 +172,16 @@ function plot_xy(destination, datasets, options) {
       width = ("width" in options ? options.width : 400) - margin.left - margin.right,
       height = ("height" in options ? options.height : 200) - margin.top - margin.bottom;
 
-  var margin = "margin" in options ? options.margin : {top: 30, right: 80, bottom: 40, left: 80},
-      width = ("width" in options ? options.width : 400) - margin.left - margin.right,
-      height = ("height" in options ? options.height : 200) - margin.top - margin.bottom;
+  // Function support for different browsers
+  Math.log10 = Math.log10 || function(x) {
+    return Math.log(x) * Math.LOG10E;
+  };
+  Number.isInteger = Number.isInteger || function(x) {
+    return typeof x === "number" && isFinite(x) && Math.floor(x) === x;
+  };
+  Math.sign = Math.sign || function (x) {
+    return x > 0 ? 1 : x < 0 ? -1 : x;
+  }
 
   var xmin = d3.min(datasets.map(function (d) { return d3.min(d[0]);}));
   var xmax = d3.max(datasets.map(function (d) { return d3.max(d[0]);}));
@@ -257,7 +278,7 @@ function plot_xy(destination, datasets, options) {
 
   chart1.append("text")
     .attr("text-anchor", "middle")
-    .attr("transform", "translate("+ (width/2)+","+(height+margin.bottom/1.5)+")")
+    .attr("transform", "translate("+ (width/2)+","+(height+margin.bottom/1.3)+")")
     .attr("style", "font-size:" + ("label_size" in options ? options.label_size : 15) + "px;")
     .text(x_label);
 
@@ -270,7 +291,7 @@ function plot_xy(destination, datasets, options) {
   chart1.append("text")
     .attr("text-anchor", "middle")
     .attr("transform",
-          "translate("+(-margin.left/1.2)+","+(height/2.0)+")rotate(-90)")
+          "translate("+(-margin.left/1.3)+","+(height/2.0)+")rotate(-90)")
     .attr("style", "font-size:" + ("label_size" in options ? options.label_size : 15) + "px;")
     .text(y_label);
 
@@ -426,6 +447,7 @@ function plot_xy(destination, datasets, options) {
         .attr("fill",colors((i+color_index)%10));
       d3.select(destination)
         .append("text")
+        .attr("style", "font-size:" + ("label_size" in options ? options.label_size : 15) + "px;")
         .text(d);
     });
   }
