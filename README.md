@@ -146,7 +146,12 @@ optional `options` argument can have the following properties:
  - `margin`: a dictionary mapping `top`, `right`, `bottom`, and `left` to their respective paddings
  - `circles`: An array of arrays of x and y values. Draws a circle on the plot for each
  (x, y) point in the array.
- - `circle_color`: The color of the plotted circles.
+ - `circle_color`: the color of the plotted circles.
+ - `graph_text`: text to be displayed on the graph.
+ - `graph_text_location`: an array containing an x and y value that determines the location of graph_text
+ in pixels relative to the plot. [0, 0] represnts the top-left corner of the plot, with x-values increasing to
+ the left and y-values increasing downwards.
+ - `graph_text_size`: font size of graph_text
 
 A second y-axis, on the right-side of the plot, can be added by
 specifying these properties in the `options` argument:

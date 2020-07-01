@@ -58,7 +58,7 @@ var SlidenPlotApp = (function (controls) {
         .ticks(5).tickFormat(formatter)
         .displayValue(false)
         .on('onchange.a', function (value)
-            { internal_callback(); })
+            { input_box.property("value", d3.format(".6e")(value)); internal_callback() })
         .on('drag', function (value)
             { input_box.property("value", d3.format(".6e")(value)); })
         .on('end', function (value)
@@ -68,7 +68,7 @@ var SlidenPlotApp = (function (controls) {
     d3.select(target).append("br");
     d3.select(target)
       .append('svg')
-      .attr('width', 500)
+      .attr('width', slider_width + 100)
       .attr('height', 60)
       .append('g')
       .attr('transform', 'translate(30,20)')
@@ -105,6 +105,7 @@ var SlidenPlotApp = (function (controls) {
         }
       }
     });
+    return slider;
   };
 
   var add_radio_buttons = function(target, short_name, name, button_names,
@@ -300,6 +301,16 @@ function plot_xy(destination, datasets, options) {
     .attr("transform", "translate("+(width + margin.right/1.3)+","+(height/2)+")rotate(-90)")
     .attr("style", "font-size:" + ("label_size" in options ? options.label_size : 15) + "px;")
     .text(y2_label);
+
+  if ("graph_text" in options) {
+    let location = "graph_text_location" in options ? options.graph_text_location : [width/4, height/4];
+    chart1.append("text")
+    .attr("text-anchor", "middle")
+    .attr("transform", "translate("+location[0]+","+location[1]+")")
+    .attr("style", "font-size:" + ("graph_text_size" in options ? options.graph_text_size : 15) + "px;" +
+                   "font-weight: bold")
+    .text(options.graph_text);
+  }
 
   datasets.forEach(function (d, i) {
     let xarray = d[0];
