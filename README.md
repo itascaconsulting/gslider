@@ -81,6 +81,8 @@ properties:
  - `input_width`: the width of the input box in pixels
  - `font_size`: the font size of the text
  - `fill`: a fill color for the slider
+ - `info_text`: adds the text as a small info pop-up for the slider
+ - `info_text_size`: text size of the info text
 
 `add_radio_buttons(selector, short_name, long_name, button_names, starting_value, options)`
 

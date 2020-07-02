@@ -3,8 +3,7 @@
 
 var SlidenPlotApp = (function (controls) {
   var getters_ = {},
-      user_callback = undefined,
-      expFormat = d3.format(".3e");
+      user_callback = undefined;
 
   var get_values = function () {
     var ret = {};
@@ -27,23 +26,59 @@ var SlidenPlotApp = (function (controls) {
     let slider_width = options.slider_width || 300,
         input_width = options.input_width || 100,
         fill = options.fill === undefined ? null : options.fill,
-        font_size = options.font_size || 12;
+        font_size = options.font_size || 12,
+        text_format = options.text_format || d3.format(".6e");
+
     if (!(start >= min)) throw "Start must be greater than or equal to min.";
     if (!(start <= max)) throw "Start must be less than or equal to max.";
     if (!(min < max)) throw  "min must be less than max.";
-    d3.select(target)
-      .append('div')
+    let slider_div = d3.select(target)
+      .append("div")
+      .attr("class", "slider_div")
+      .attr("style", "width: " + (slider_width) + "px;")
+    slider_div
+      .append("div")
       .text(name)
-      .attr("style", "font-size: " + font_size + "px");
-    var input_box = d3.select(target)
+      .attr("style", "float:left;font-size: " + font_size + "px;width: " + (slider_width) + "px;");
+
+    if ("info_text" in options) {
+      let info_text_size = options.info_text_size || font_size;
+      slider_div.select("div")
+        .append("div")
+        .attr("id", "info_img_" + short_name)
+        .text("🛈")
+        .attr("style", "float:right; margin: 0 0;font-size: " + font_size + "px; position: relative;" +
+                       "top: -" + (font_size / 36 * 5) + "px")
+      slider_div.select("div")
+        .append("div")
+        .attr('class', 'info')
+        .text(options.info_text)
+        .attr("style", "border: 1px solid black; background-color: white; position: absolute;" +
+                       "width: " + (-2.33 + slider_width) + "px;font-size: " + info_text_size + "px;")
+      // Add hovering style for info
+      let style;
+      style = document.getElementById("sliders_info_style");
+      if (!style) {
+        style = document.createElement('style', { is : 'text/css' });
+        style.id = "sliders_info_style";
+        style.innerHTML = '.info { display: none; } '
+        document.getElementsByTagName('head')[0].appendChild(style);
+      }
+      style.innerHTML = style.innerHTML + '#info_img_' + short_name + ':hover + .info { display: block; }';
+    }
+
+    let input_div = slider_div
+      .append('div')
+      .attr("style", "clear:both;width:" + input_width + "px;")
+    var input_box = input_div
         .append("input")
         .attr("name", short_name)
     input_box.attr("type", "number")
-      .property('value', d3.format(".6e")(start))
+      .property('value', text_format(start))
       .property("min", min)
       .property("max", max)
       .property("step", (max - min)/100.0)
-      .attr("style", "width: " + input_width + "px; font-size: " + font_size + "px")
+      .attr("style", "clear:both;position:static;width: " + input_width + "px; font-size: " + font_size + "px")
       .attr("data-currentvalue", start);
 
     var formatter = (max < 1e3) ? d3.format("") : d3.format(".1e");
@@ -53,25 +88,24 @@ var SlidenPlotApp = (function (controls) {
         .max(max)
         .step((max-min)/200.0)
         .default(start)
-        .width(slider_width)
+        .width(slider_width * 3/4)
         .fill(fill)
         .ticks(5).tickFormat(formatter)
         .displayValue(false)
         .on('onchange.a', function (value)
-            { input_box.property("value", d3.format(".6e")(value)); internal_callback() })
+            { input_box.property("value", text_format(value)); internal_callback() })
         .on('drag', function (value)
-            { input_box.property("value", d3.format(".6e")(value)); })
+            { input_box.property("value", text_format(value)); })
         .on('end', function (value)
-            { input_box.property("value", d3.format(".6e")(value)); });
+            { input_box.property("value", text_format(value)); });
     getters_[short_name] = (function () { return slider.value(); });
 
-    d3.select(target).append("br");
-    d3.select(target)
+    slider_div
       .append('svg')
-      .attr('width', slider_width + 100)
+      .attr('width', slider_width)
       .attr('height', 60)
       .append('g')
-      .attr('transform', 'translate(30,20)')
+      .attr('transform', 'translate(12,20)')
       .call(slider);
 
     // link input box change to slider
