@@ -54,7 +54,8 @@ var SlidenPlotApp = (function (controls) {
         .attr('class', 'info')
         .text(options.info_text)
         .attr("style", "border: 1px solid black; background-color: white; position: absolute;" +
-                       "width: " + (-2.33 + slider_width) + "px;font-size: " + info_text_size + "px;")
+                       "width: " + (-6.67 + slider_width) + "px;font-size: " + info_text_size + "px;" +
+                       "padding: 2px 2px")
       // Add hovering style for info
       let style;
       style = document.getElementById("sliders_info_style");
