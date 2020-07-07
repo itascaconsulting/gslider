@@ -236,30 +236,29 @@ function plot_xy(destination, datasets, options) {
   // If using a log-x scale, domain must be strictly positive or strictly negative (0 excluded)
   // If domain does not fulfill these requirements, use a linear scale instead
   if (!options.logx || !(Math.sign(xmin_use) === Math.sign(xmax_use) && xmin_use !== 0 && xmax_use !== 0)) {
-     x = d3.scaleLinear()
-           .domain([xmin_use, xmax_use])
-           .range([0, width]);
+     x = d3.scaleLinear();
   } else {
-    x = d3.scaleLog()
-          .domain([xmin_use, xmax_use])
-          .range([0, width]);
+    x = d3.scaleLog();
   }
 
   // If using a log-y scale, domain must be strictly positive or strictly negative (0 excluded)
   // If domain does not fulfill these requirements, use a linear scale instead
   if (!options.logy || !(Math.sign(ymin_use) === Math.sign(ymax_use) && ymin_use !== 0 && ymax_use !== 0)) {
-    y = d3.scaleLinear()
-          .domain([ymin_use, ymax_use])
-          .range([height, 0]);
+    y = d3.scaleLinear();
     y2 = d3.scaleLinear()
-           .range([height, 0]);
   } else {
     y = d3.scaleLog()
-          .domain([ymin_use, ymax_use])
-          .range([height, 0]);
-    y2 = d3.scaleLog()
-           .range([height, 0]);
+    y2 = d3.scaleLog();
   }
+
+  x.domain([xmin_use, xmax_use])
+   .range([0, width])
+   .clamp(true);
+  y.domain([ymin_use, ymax_use])
+   .range([height, 0])
+   .clamp(true);
+  y2.range([height, 0])
+   .clamp(true);
 
   if ("right_y_scale" in options) {
     y2.domain([ymin_use*options.right_y_scale,
