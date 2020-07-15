@@ -35,27 +35,31 @@ var SlidenPlotApp = (function (controls) {
     let slider_div = d3.select(target)
       .append("div")
       .attr("class", "slider_div")
-      .attr("style", "width: " + (slider_width) + "px;")
-    slider_div
-      .append("div")
+      .attr("style", "width: " + (slider_width) + "px;");
+    let slider_div_header = slider_div.append("div");
+    slider_div_header.append("div")
       .text(name)
-      .attr("style", "float:left;font-size: " + font_size + "px;width: " + (slider_width) + "px;");
+      .attr("style", "float:left; font-size: " + font_size + "px;");
 
     if ("info_text" in options) {
       let info_text_size = options.info_text_size || font_size;
-      slider_div.select("div")
+      slider_div_header
         .append("div")
         .attr("id", "info_img_" + short_name)
-        .text("🛈")
-        .attr("style", "float:right; margin: 0 0;font-size: " + font_size + "px; position: relative;" +
-                       "top: -" + (font_size / 36 * 5) + "px")
-      slider_div.select("div")
+        .text("?")
+        .attr("style", "float:left; margin: 0 0 0 10px;font-size: " + (font_size - 1) + "px; position: relative;" +
+                       "top: -" + (font_size / 36 * 5) + "px" + "; border: 1px solid black;" +
+                       "border-radius: " + (font_size + 2) + "px; width: " + (font_size + 2) + "px;" +
+                       "height: " + (font_size + 2) + "px; text-align: center; background: black;" +
+                       "color: white; text-decoration: none; cursor: default")
+      slider_div_header
         .append("div")
         .attr('class', 'info')
         .text(options.info_text)
-        .attr("style", "border: 1px solid black; background-color: white; position: absolute;" +
+        .attr("style", "border: 1px solid black; background: #cbcbcb; position: absolute;" +
                        "width: " + (-6.67 + slider_width) + "px;font-size: " + info_text_size + "px;" +
-                       "padding: 2px 2px")
+                       "padding: 2px 2px; white-space: pre-wrap; border-radius: 6px; z-index: 2;" +
+                       "transform: translateY(" + (font_size + 5) + "px);")
       // Add hovering style for info
       let style;
       style = document.getElementById("sliders_info_style");
@@ -89,7 +93,7 @@ var SlidenPlotApp = (function (controls) {
         .max(max)
         .step((max-min)/200.0)
         .default(start)
-        .width(slider_width * 3/4)
+        .width(slider_width * 7 / 8)
         .fill(fill)
         .ticks(5).tickFormat(formatter)
         .displayValue(false)
@@ -147,15 +151,16 @@ var SlidenPlotApp = (function (controls) {
                                    checked, options) {
     options = options || {};
     let font_size = options.font_size || 12;
-    d3.select(target)
+    let radio_div = d3.select(target)
       .append('div')
       .text(name)
+      .attr("class", "radio_div")
       .attr("style", "font-size: " + font_size + "px");
     for (var i=0; i<button_names.length; i++) {
-      d3.select(target).append("div")
+      radio_div.append("div")
           .text(button_names[i])
           .attr("style", "font-size: " + (font_size - 2) + "px");
-      var tmp =  d3.select(target).append("input")
+      var tmp =  radio_div.append("input")
           .attr("type", "radio")
           .attr("name", short_name)
           .attr("value", button_names[i])
