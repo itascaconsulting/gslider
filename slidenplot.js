@@ -357,6 +357,8 @@ function plot_xy(destination, datasets, options) {
     chart1.append("path")
       .attr("class", "line")
       .attr("stroke", colors((i+color_index)%10))
+      .attr("stroke-width", 'line_width' in options ? options.line_width + 'px' : '2px')
+      .attr("fill", 'none')
       .attr("d", valueline(xarray, yarray, x, y));
   });
 
@@ -375,6 +377,8 @@ function plot_xy(destination, datasets, options) {
       chart1.append("path")
         .attr("class", "line")
         .attr("stroke", colors((i+color_offset)%10))
+        .attr("stroke-width", 'line_width' in options ? options.line_width + 'px' : '2px')
+        .attr("fill", 'none')
         .attr("d", valueline(xarray, yarray, x, y2));
     });
   }
