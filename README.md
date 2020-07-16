@@ -129,6 +129,8 @@ optional `options` argument can have the following properties:
  - `axhlines`: an array of y-values giving locations to plot
    horizontal lines.
  - `axvlines`: an array of x-values giving locations to plot vertical lines.
+ - `dashlen`: If specified, makes the horizontal and vertical lines dashed, with each dash being `dashlen` pixels long
+ - `line_width`: The width of the plotted vertical and horizontal lines in pixels
  - `title`: a title, rendered above the chart.
  - `colors`: a `d3` ordinal scale that returns colors. Each data set
    is given a color according to this scale. The default is

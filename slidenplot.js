@@ -384,6 +384,8 @@ function plot_xy(destination, datasets, options) {
       chart1.append("path")
         .attr("class", "horizontal_line")
         .attr("stroke", colors((i+color_index)%10))
+        .attr("stroke-dasharray", 'dashlen' in options ? options.dashlen + ', ' + options.dashlen : '0, 0')
+        .attr("stroke-width", 'line_width' in options ? options.line_width + 'px' : '2px')
         .attr("d", valueline(x.domain(), [d,d], x,y));
     });
   }
@@ -394,6 +396,8 @@ function plot_xy(destination, datasets, options) {
       chart1.append("path")
         .attr("class", "horizontal_line")
         .attr("stroke", colors((ax2hline_color)%10))
+        .attr("stroke-dasharray", 'dashlen' in options ? options.dashlen + ', ' + options.dashlen : '0, 0')
+        .attr("stroke-width", 'line_width' in options ? options.line_width + 'px' : '2px')
         .attr("d", valueline(x.domain(), [d,d], x,y2));
     });
   }
@@ -402,6 +406,8 @@ function plot_xy(destination, datasets, options) {
       chart1.append("path")
         .attr("class", "vertical_line")
         .attr("stroke", colors((i+color_index)%10))
+        .attr("stroke-dasharray", 'dashlen' in options ? options.dashlen + ', ' + options.dashlen : '0, 0')
+        .attr("stroke-width", 'line_width' in options ? options.line_width + 'px' : '2px')
         .attr("d", valueline([d,d], y.domain(),x,y));
     });
   }
