@@ -48,10 +48,10 @@ var SlidenPlotApp = (function (controls) {
         .attr("id", "info_img_" + short_name)
         .text("?")
         .attr("style", "float:left; margin: 0 0 0 10px;font-size: " + (font_size - 1) + "px; position: relative;" +
-                       "top: -" + (font_size / 36 * 5) + "px" + "; border: 1px solid black;" +
+                       "top: -" + (font_size / 36 * 5) + "px" + "; border: 1px solid blue;" +
                        "border-radius: " + (font_size + 2) + "px; width: " + (font_size + 2) + "px;" +
-                       "height: " + (font_size + 2) + "px; text-align: center; background: black;" +
-                       "color: white; text-decoration: none; cursor: default")
+                       "height: " + (font_size + 2) + "px; text-align: center;" +
+                       "color: blue; text-decoration: none; cursor: default")
       slider_div_header
         .append("div")
         .attr('class', 'info')
