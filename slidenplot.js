@@ -341,16 +341,6 @@ function plot_xy(destination, datasets, options) {
     .attr("style", "font-size:" + ("label_size" in options ? options.label_size : 15) + "px;")
     .text(y2_label);
 
-  if ("graph_text" in options) {
-    let location = "graph_text_location" in options ? options.graph_text_location : [width/4, height/4];
-    chart1.append("text")
-    .attr("text-anchor", "middle")
-    .attr("transform", "translate("+location[0]+","+location[1]+")")
-    .attr("style", "font-size:" + ("graph_text_size" in options ? options.graph_text_size : 15) + "px;" +
-                   "font-weight: bold")
-    .text(options.graph_text);
-  }
-
   datasets.forEach(function (d, i) {
     let xarray = d[0];
     let yarray = d[1];
@@ -414,6 +404,16 @@ function plot_xy(destination, datasets, options) {
         .attr("stroke-width", 'line_width' in options ? options.line_width + 'px' : '2px')
         .attr("d", valueline([d,d], y.domain(),x,y));
     });
+  }
+
+  if ("graph_text" in options) {
+    let location = "graph_text_location" in options ? options.graph_text_location : [width/4, height/4];
+    chart1.append("text")
+    .attr("text-anchor", "middle")
+    .attr("transform", "translate("+location[0]+","+location[1]+")")
+    .attr("style", "font-size:" + ("graph_text_size" in options ? options.graph_text_size : 15) + "px;" +
+                   "font-weight: bold")
+    .text(options.graph_text);
   }
 
   chart1.append("g")
