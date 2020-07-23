@@ -111,6 +111,11 @@ Return the values of the inputs as an object where the properties are the short_
 the current values of the inputs. This function is automatically called before the user specified callback function is
 invoked. It is not typically necessary to call this function but it is available for testing.
 
+`set_values(data)`
+
+Sets the values of the plot's sliders according to the data parameter. `data` is a dictionary mapping the
+short names of the sliders to their new value(s). 
+
 ### Plotting
 The `plot_xy` function is provided to simplify
 creating x,y plots with [d3](https://d3js.org).

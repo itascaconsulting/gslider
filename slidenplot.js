@@ -1,25 +1,42 @@
-// in the slider the input box shoud be authoritative
-// ensure a valid value in input box when focus leaves?
+var SlidenPlotApp = (function() {
 
-var SlidenPlotApp = (function (controls) {
   var getters_ = {},
-      user_callback = undefined;
+      user_callback = undefined,
+      sliders = {},
+      internal_callback = function() { user_callback(get_values()); };
 
-  var get_values = function () {
+
+  var get_values = function() {
+    /**
+     * Returns the parameters of the app as a dictionary accessed by short name
+     */
     var ret = {};
     for (var key in getters_) {
       if (!getters_.hasOwnProperty(key)) continue;
       ret[key] = getters_[key].call();
     }
     return ret;
-  };
+  }
 
-  var internal_callback = function() {
+  var set_values = function(new_data) {
+    /**
+     * Sets the parameters of the app
+     */
+    for (let key in sliders) {
+      sliders[key].value(new_data[key])
+    }
     user_callback(get_values());
-  };
+  }
 
-  var add_float_slider = function(target, short_name, name, start,
-                                  min_, max_, options) {
+  var set_callback = function(callback) {
+    /**
+     * Sets the callback to the inputted function
+     */
+    user_callback = callback;
+    internal_callback()
+  }
+
+  var add_float_slider = function(target, short_name, name, start, min_, max_, options) {
     var min = min_,
         max = max_;
     options = options || {};
@@ -144,11 +161,11 @@ var SlidenPlotApp = (function (controls) {
         }
       }
     });
+    sliders[short_name] = slider;
     return slider;
-  };
+  }
 
-  var add_radio_buttons = function(target, short_name, name, button_names,
-                                   checked, options) {
+  var add_radio_buttons = function(target, short_name, name, button_names, checked, options) {
     options = options || {};
     let font_size = options.font_size || 12;
     let radio_div = d3.select(target)
@@ -170,7 +187,7 @@ var SlidenPlotApp = (function (controls) {
     getters_[short_name] = function () {
       return document.querySelector('input[name="'+short_name+'"]:checked').value;
     };
-  };
+  }
 
   var add_check_box = function(target, short_name, name, checked) {
     d3.select(target)
@@ -184,21 +201,19 @@ var SlidenPlotApp = (function (controls) {
     getters_[short_name] = function () { return !!input.property("checked"); };
   };
 
-  var add_callback = function (callback) {
-    user_callback = callback;
-    internal_callback();
-  };
-
   return {
     add_float_slider: add_float_slider,
     add_radio_buttons: add_radio_buttons,
     add_check_box: add_check_box,
-    add_callback: add_callback,
-    get_values: get_values
-  };
+    set_callback: set_callback,
+    get_values: get_values,
+    set_values: set_values
+  }
+
 });
 
 function plot_xy(destination, datasets, options) {
+
   document.querySelectorAll(destination)[0].innerHTML ="";
 
   var options = options || {};
