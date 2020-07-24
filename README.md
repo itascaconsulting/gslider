@@ -83,6 +83,8 @@ properties:
  - `fill`: a fill color for the slider
  - `info_text`: adds the text as a small info pop-up for the slider
  - `info_text_size`: text size of the info text
+ - `text_format`: The d3 format of the input box's value
+ - `margin`: The margins surrounding the input area. Given as a css string.
 
 `add_radio_buttons(selector, short_name, long_name, button_names, starting_value, options)`
 
@@ -92,12 +94,29 @@ are also used as the input value. `starting_value` can be the value of one of th
 selected. The optional `options` argument can have the following properties:
 
  - `font_size`: the font size of the text
+ - `inline`: Whether the radio buttons should be on the same line (`true`) or separate lines (`false`)
+ - `margin`: The margins surrounding the radio buttons. Given as a css string.
 
 `add_check_box(selector, short_name, long_name, starting_value)`
 
 Add a check box input to the HTML element given by `selector`.
 `short_name` is used to access the values, `long_name` is used as the
 input label, and if `starting_value` is true the box will be check initially.
+
+`add_input_box(target, short_name, long_name, starting_value, options)`
+
+Adds an input box to the HTML element given by `selector`.
+`short_name` is used to access the values, `long_name` is used as the input label, and `starting_value` is the
+initial value inside of the input box. The optional `options` argument can have the following
+properties:
+
+ - `input_width`: The width of the input box in pixels
+ - `font_size`: The font size of the text
+ - `min`: The minimum value allowed 
+ - `max`: The maximum value allowed
+ - `text_format`: The d3 format of the input box's value
+ - `inline`: Whether the input label and the input box should be on the same line (`true`) or separate lines (`false`)
+ - `margin`: The margins surrounding the input area. Given as a css string.
 
 `add_callback(callable)`
 
@@ -113,8 +132,8 @@ invoked. It is not typically necessary to call this function but it is available
 
 `set_values(data)`
 
-Sets the values of the plot's sliders according to the data parameter. `data` is a dictionary mapping the
-short names of the sliders to their new value(s). 
+Sets the values of the plot's input elements according to the data parameter. `data` is a dictionary mapping the
+short names of the elements to their new value(s). 
 
 ### Plotting
 The `plot_xy` function is provided to simplify
