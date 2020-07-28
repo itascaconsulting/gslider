@@ -156,7 +156,7 @@ optional `options` argument can have the following properties:
  - `dashlen`: If specified, makes the horizontal and vertical lines dashed, with each dash being `dashlen` pixels long
  - `line_width`: The width of the plotted lines pixels
  - `title`: a title, rendered above the chart.
- - `colors`: a `d3` ordinal scale that returns colors. Each data set
+ - `colors`: An array containing strings representing colors. Each data set
    is given a color according to this scale. The default is
    `d3.schemeCategory10`.
  - `color_index`: The starting index into `colors`. The default is 0.
