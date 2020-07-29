@@ -117,6 +117,8 @@ properties:
  - `text_format`: The d3 format of the input box's value
  - `inline`: Whether the input label and the input box should be on the same line (`true`) or separate lines (`false`)
  - `margin`: The margins surrounding the input area. Given as a css string.
+ - `info_text`: adds the text as a small info pop-up for the slider
+ - `info_text_size`: text size of the info text
 
 `add_callback(callable)`
 

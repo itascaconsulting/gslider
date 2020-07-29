@@ -48,8 +48,7 @@ var SlidenPlotApp = (function() {
         fill = options.fill === undefined ? null : options.fill,
         font_size = options.font_size || 12,
         text_format = options.text_format || d3.format(".6e"),
-        inline = options.inline || false,
-        margins = options.margins || "5px 5px";
+        margin = options.margin || "5px";
 
     if (!(start >= min)) throw "Start must be greater than or equal to min.";
     if (!(start <= max)) throw "Start must be less than or equal to max.";
@@ -57,7 +56,7 @@ var SlidenPlotApp = (function() {
     let slider_div = d3.select(target)
       .append("div")
       .attr("class", "slider_div")
-      .attr("style", "width: " + (slider_width) + "px;");
+      .attr("style", "width: " + (slider_width) + "px; margin: " + margin);
     let slider_div_header = slider_div.append("div");
     slider_div_header.append("div")
       .text(name)
@@ -240,15 +239,15 @@ var SlidenPlotApp = (function() {
     let input_div = d3.select(target)
       .append("div")
       .attr("class", "input_div")
-      .attr("style", "overflow: hidden; clear: both; margin: " + margin +
+      .attr("id", "input_div_"+short_name)
+      .attr("style", "clear: both; margin: " + margin +
                      ";font-size: " + font_size + "px;");
 
     // Header
-    let header = input_div.append("p")
-      .text(long_name);
-    if (inline) {
-      header.attr("style", "float: left; font-size: " + font_size + "px; margin-right: 5px");
-    }
+    let header = input_div.append("div");
+    header.append("p")
+      .text(long_name)
+      .attr('style', "margin-right: 5px; float: left; font-size: " + font_size + 'px;')
 
     // Input box
     let input_box = input_div
@@ -257,10 +256,51 @@ var SlidenPlotApp = (function() {
         .attr("type", "number")
         .property('value', text_format(starting_value));
     if (inline) {
-      input_box.attr("style", "float:left;width: " + input_width + "px; font-size: " + font_size + "px;")
+      input_box.attr("style", "float:left;width: " + input_width + "px; font-size: " + font_size + "px;" +
+                              "transform: translateY(-12.5%);")
     } else {
       input_box.attr("style", "clear:both;position:static;width: " + input_width + "px; font-size: " + font_size + "px")
     }
+
+    // Add info text
+    if ("info_text" in options) {
+      let info_text_size = options.info_text_size || font_size;
+      let info_target;
+      let text_style = "border: 1px solid black; background: #cbcbcb; position: absolute;" +
+                       "padding: 2px 2px; white-space: pre-wrap; border-radius: 6px; z-index: 2;" +
+                       "font-size: " + info_text_size + "px;"
+      if (inline) {
+        info_target = input_div;
+        text_style += "width: " + (document.getElementById("input_div_" + short_name).clientWidth - 6) + "px;" +
+                      "transform: translateY(" + (font_size + 5) + "px);"
+      } else {
+        info_target = header;
+        text_style += "width: " + (input_width + 1) + "px; transform: translateY(" + (font_size + 4) + "px);"
+      }
+      info_target.append("div")
+          .attr("id", "info_img_" + short_name)
+          .text("?")
+          .attr("style", "float:left; margin: 0 0 0 5px;font-size: " + (font_size - 1) + "px; position: relative;" +
+                         "top: -" + (font_size / 36 * 5) + "px" + "; border: 1px solid blue;" +
+                         "border-radius: " + (font_size + 2) + "px; width: " + (font_size + 2) + "px;" +
+                         "height: " + (font_size + 2) + "px; text-align: center;" +
+                         "color: blue; text-decoration: none; cursor: default")
+      info_target.append("div")
+        .attr('class', 'info')
+        .text(options.info_text)
+        .attr("style", text_style)
+      // Add hovering style for info
+      let style;
+      style = document.getElementById("sliders_info_style");
+      if (!style) {
+        style = document.createElement('style', { is : 'text/css' });
+        style.id = "sliders_info_style";
+        style.innerHTML = '.info { display: none; } '
+        document.getElementsByTagName('head')[0].appendChild(style);
+      }
+      style.innerHTML = style.innerHTML + '#info_img_' + short_name + ':hover + .info { display: block; }';
+    }
+
 
 
     // Handle options
@@ -624,9 +664,7 @@ function plot_xy(destination, datasets, options) {
   if ("show_datapoints" in options) {
     // Turn into array if not an array
     if (!(Array.isArray(options.show_datapoints))) {
-      let temp = options.show_datapoints;
-      options.show_datapoints = [];
-      datasets.forEach(function (e) { options.show_datapoints.push(temp); });
+      options.show_datapoints = [options.show_datapoints];
     }
     // Initialize defaults
     let color = options.datapoint_color || colors(color_index);
