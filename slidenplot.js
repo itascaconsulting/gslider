@@ -187,7 +187,7 @@ var SlidenPlotApp = (function() {
       .attr("style", "font-size: " + font_size + "px; clear: both; overflow: hidden; margin: " + margin);
     radio_div.append('p')
       .text(name)
-      .attr("style", "margin: 0 0")
+      .attr("style", "margin: 0 0;")
 
     let selections = {};
     for (let i=0; i<button_names.length; i++) {
@@ -201,7 +201,8 @@ var SlidenPlotApp = (function() {
           .attr("type", "radio")
           .attr("name", short_name)
           .attr("value", button_names[i])
-          .attr("style", 'float: left; transform: translateY(2px)')
+          .attr("style", 'float: left; border: 0px; height: ' + font_size + 'px; ' +
+                         'width: ' + font_size + 'px; margin-top: 0')
           .on("change", function () { internal_callback(); });
       selections[button_names[i]] = selection;
       section.append("p")
@@ -323,7 +324,9 @@ function plot_xy(destination, datasets, options) {
   document.querySelectorAll(destination)[0].innerHTML ="";
 
   var options = options || {};
-  var colors = options.colors || d3.scaleOrdinal(d3.schemeCategory10).domain(d3.range(10));
+  var colors = 'colors' in options ? d3.scaleOrdinal().range(options.colors)
+                                       .domain(d3.range(options.colors.length)) :
+                                     d3.scaleOrdinal(d3.schemeCategory10).domain(d3.range(10));
   var color_index = options.color_index || 0;
   var x_label = options.x_label || "";
   var y_label = options.y_label || "";
@@ -465,12 +468,15 @@ function plot_xy(destination, datasets, options) {
   datasets.forEach(function (d, i) {
     let xarray = d[0];
     let yarray = d[1];
-    chart1.append("path")
+    let path = chart1.append("path")
       .attr("class", "line")
-      .attr("stroke", colors((i+color_index)%10))
+      .attr("stroke", colors((i+color_index)%options.colors.length))
       .attr("stroke-width", 'line_width' in options ? options.line_width + 'px' : '2px')
       .attr("fill", 'none')
       .attr("d", valueline(xarray, yarray, x, y));
+    if ("opacity" in options) {
+      path.attr("opacity", options.opacity[i]);
+    }
   });
 
   var color_offset = datasets.length + color_index;
@@ -605,7 +611,7 @@ function plot_xy(destination, datasets, options) {
     .attr("font-size", ("axes_size" in options ? options.axes_size : 10));
 
   if ("circles" in options) {
-    let color = "circle_color" in options ? options.circle_color : colors((color_index));
+    let color = "circle_color" in options ? options.circle_color : colors(color_index);
     options.circles.forEach(function (d,i) {
       chart1.append("circle")
           .attr("cx", x(d[0]))
@@ -613,6 +619,31 @@ function plot_xy(destination, datasets, options) {
           .attr("r", 10)
           .attr("fill", color);
     });
+  }
+
+  if ("show_datapoints" in options) {
+    // Turn into array if not an array
+    if (!(Array.isArray(options.show_datapoints))) {
+      let temp = options.show_datapoints;
+      options.show_datapoints = [];
+      datasets.forEach(function (e) { options.show_datapoints.push(temp); });
+    }
+    // Initialize defaults
+    let color = options.datapoint_color || colors(color_index);
+    let radius = options.datapoint_radius || 5;
+    // Iterate through datasets
+    for (let i = 0; i < options.show_datapoints.length; i++) {
+      if (options.show_datapoints[i]) {
+        let d = datasets[i];
+        for (let i = 0; i < d[0].length; i++) {
+          chart1.append("circle")
+                .attr("cx", x(d[0][i]))
+                .attr("cy", y(d[1][i]))
+                .attr("r", radius)
+                .attr("fill", color);
+        }
+      }
+    }
   }
 
   if ("legend" in options) {

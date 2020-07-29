@@ -156,9 +156,8 @@ optional `options` argument can have the following properties:
  - `dashlen`: If specified, makes the horizontal and vertical lines dashed, with each dash being `dashlen` pixels long
  - `line_width`: The width of the plotted lines pixels
  - `title`: a title, rendered above the chart.
- - `colors`: a `d3` ordinal scale that returns colors. Each data set
-   is given a color according to this scale. The default is
-   `d3.schemeCategory10`.
+ - `colors`: An array containing strings of colors, either in hexadecimal form or standard form ('blue', 'red', etc).
+             Each data set is given a color according to this scale. The default is `d3.schemeCategory10`.
  - `color_index`: The starting index into `colors`. The default is 0.
  - `legend`: an array of strings giving the name of each data_set. A
    color marker and the data_set name are written to the same HTML
@@ -177,9 +176,14 @@ optional `options` argument can have the following properties:
  - `circle_color`: the color of the plotted circles.
  - `graph_text`: text to be displayed on the graph.
  - `graph_text_location`: an array containing an x and y value that determines the location of graph_text
- in pixels relative to the plot. [0, 0] represnts the top-left corner of the plot, with x-values increasing to
+ in pixels relative to the plot. [0, 0] represents the top-left corner of the plot, with x-values increasing to
  the left and y-values increasing downwards.
  - `graph_text_size`: font size of graph_text
+ - `opacity`: An array containing floats from 0 - 1 for each inputted dataset. The opacity of the plot of each
+              dataset is set to the respective array element (of the same index).
+ - `show_datapoints`: A single boolean or an array of booleans indicating whether datapoints should be drawn for the plots.
+                      If a single boolean and true, draws datapoints for every plot. Else, draws datapoints for the
+                      plots where the boolean at the respective index is true.   
 
 A second y-axis, on the right-side of the plot, can be added by
 specifying these properties in the `options` argument:
