@@ -244,7 +244,8 @@ var SlidenPlotApp = (function() {
                      ";font-size: " + font_size + "px;");
 
     // Header
-    let header = input_div.append("div");
+    let header = input_div.append("div")
+      .attr('style', 'height: ' + (font_size*1.2) + 'px;');
     header.append("p")
       .text(long_name)
       .attr('style', "margin-right: 5px; float: left; font-size: " + font_size + 'px;')
