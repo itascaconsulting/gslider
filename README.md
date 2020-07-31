@@ -120,6 +120,15 @@ properties:
  - `info_text`: adds the text as a small info pop-up for the slider
  - `info_text_size`: text size of the info text
 
+`add_drop_down(target, short_name, long_name, selections, options`
+
+Adds a drop-down box to the HTML element given by `selector`. `short_name` is used to access the values, 
+`long_name` is used as the label, and `selections` is an array of possible options that the drop down contains.
+The optional `options` argument can have the following properties:
+
+ - `font-size`: The font size of the text
+ - `margin`: The margins surround the input area. Given as a css string.
+
 `add_callback(callable)`
 
 Register a user written function to be called when the value of any input changes. The function should take a single

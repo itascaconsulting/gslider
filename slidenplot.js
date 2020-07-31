@@ -228,6 +228,7 @@ var SlidenPlotApp = (function() {
   };
 
   var add_input_box = function(target, short_name, long_name, starting_value, options) {
+    options = options || {};
     let input_width = options.input_width || 150,
         font_size = options.font_size || 16,
         text_format = options.text_format || d3.format(".6e"),
@@ -245,7 +246,7 @@ var SlidenPlotApp = (function() {
 
     // Header
     let header = input_div.append("div")
-      .attr('style', 'height: ' + (font_size*1.2) + 'px;');
+      .attr('style', 'height: ' + (font_size*1.25) + 'px;');
     header.append("p")
       .text(long_name)
       .attr('style', "margin-right: 5px; float: left; font-size: " + font_size + 'px;')
@@ -302,8 +303,6 @@ var SlidenPlotApp = (function() {
       style.innerHTML = style.innerHTML + '#info_img_' + short_name + ':hover + .info { display: block; }';
     }
 
-
-
     // Handle options
     if ('max' in options) input_box.property("max", options.max)
     if ('min' in options) input_box.property("min", options.min)
@@ -348,11 +347,42 @@ var SlidenPlotApp = (function() {
 
   }
 
+  var add_drop_down = function(target, short_name, name, selections, options) {
+    options = options || {};
+    let margin = options.margin || "5px",
+        font_size = options.font_size || 14;
+
+    let selector_div = d3.select(target).append('div')
+      .attr('class', 'selector_div')
+      .attr('style', 'margin: ' + margin + ';');
+
+    let header = selector_div.append('p')
+      .text(name)
+      .attr('style', 'font-size: ' + font_size + 'px;');
+
+    let selector = selector_div.append('select')
+      .attr('name', name)
+      .attr('style', 'font-size: ' + font_size + 'px;')
+      .on('change', internal_callback);
+
+    let choices = selector.selectAll('option')
+      .data(selections)
+      .enter()
+      .append('option')
+      .text(function (e) { return e; });
+
+    getters_[short_name] = function() { return selector.property('value'); };
+    set_inputs[short_name] = function(newValue) { selector.property('value', newValue); };
+    return selector_div;
+
+  }
+
   return {
     add_float_slider: add_float_slider,
     add_radio_buttons: add_radio_buttons,
     add_check_box: add_check_box,
     add_input_box: add_input_box,
+    add_drop_down: add_drop_down,
     set_callback: set_callback,
     get_values: get_values,
     set_values: set_values
