@@ -181,7 +181,7 @@ optional `options` argument can have the following properties:
  - `title_size`: font size of the title
  - `axes_size`: font size of axes' ticks
  - `label_size`: font size of the labels for the axes
- - `margin`: a dictionary mapping `top`, `right`, `bottom`, and `left` to their respective paddings
+ - `padding`: a dictionary mapping `top`, `right`, `bottom`, and `left` to their respective paddings
  - `circles`: An array of arrays of x and y values. Draws a circle on the plot for each
  (x, y) point in the array.
  - `circle_color`: the color of the plotted circles.

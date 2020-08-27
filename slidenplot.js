@@ -5,7 +5,6 @@ var SlidenPlotApp = (function() {
       set_inputs = {}, // dictionary mapping short_name to function(new_data) that sets new data
       internal_callback = function() { user_callback(get_values()); };
 
-
   var get_values = function() {
     /**
      * Returns the parameters of the app as a dictionary accessed by short name
@@ -172,7 +171,7 @@ var SlidenPlotApp = (function() {
       }
     });
     set_inputs[short_name] = function(new_data) {slider.value(new_data); };
-    return slider_div;
+    return slider;
   }
 
   var add_radio_buttons = function(target, short_name, name, button_names, checked, options) {
@@ -246,7 +245,7 @@ var SlidenPlotApp = (function() {
 
     // Header
     let header = input_div.append("div")
-      .attr('style', 'height: ' + (font_size*1.25) + 'px;');
+      .attr('style', 'height: ' + (font_size*1.2) + 'px;');
     header.append("p")
       .text(long_name)
       .attr('style', "margin-right: 5px; float: left; font-size: " + font_size + 'px;')
@@ -347,7 +346,7 @@ var SlidenPlotApp = (function() {
 
   }
 
-  var add_drop_down = function(target, short_name, name, selections, options) {
+    var add_drop_down = function(target, short_name, name, selections, options) {
     options = options || {};
     let margin = options.margin || "5px",
         font_size = options.font_size || 14;
@@ -404,9 +403,13 @@ function plot_xy(destination, datasets, options) {
   var y2_label = options.y2_label || "";
   var title = options.title || "";
 
-  var margin = "margin" in options ? options.margin : {top: 30, right: 80, bottom: 40, left: 80},
-      width = ("width" in options ? options.width : 400) - margin.left - margin.right,
-      height = ("height" in options ? options.height : 200) - margin.top - margin.bottom;
+  var padding = "padding" in options ? options.padding : {top: 30, right: 80, bottom: 40, left: 80},
+      width = ("width" in options ? options.width : 400) - padding.left - padding.right,
+      height = ("height" in options ? options.height : 200) - padding.top - padding.bottom;
+
+  var label_size = "label_size" in options ? options.label_size : 15,
+      axes_size = "axes_size" in options ? options.axes_size : 10,
+      label_offset = "label_offset" in options ? options.label_offset : 20 + axes_size + label_size;
 
   // Function support for different browsers
   Math.log10 = Math.log10 || function(x) {
@@ -505,34 +508,34 @@ function plot_xy(destination, datasets, options) {
 
   var chart1 = d3.select(destination)
       .append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
+      .attr("width", width + padding.left + padding.right)
+      .attr("height", height + padding.top + padding.bottom)
       .attr("style", "overflow:hidden;")
       .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
 
   chart1.append("text")
     .attr("text-anchor", "middle")
-    .attr("transform", "translate("+ (width/2)+","+(height+margin.bottom/1.3)+")")
-    .attr("style", "font-size:" + ("label_size" in options ? options.label_size : 15) + "px;")
+    .attr("transform", "translate("+ (width/2)+","+(height+label_offset)+")")
+    .attr("style", "font-size:" + label_size + "px;")
     .text(x_label);
 
   chart1.append("text")
     .attr("text-anchor", "middle")
-    .attr("transform", "translate("+ (width/2)+","+(-margin.top/2.5)+")")
+    .attr("transform", "translate("+ (width/2)+","+(-padding.top/2.5)+")")
     .attr("style", "font-size:" + ("title_size" in options ? options.title_size : 15) + "px; font-weight:bold")
     .text(title);
 
   chart1.append("text")
     .attr("text-anchor", "middle")
     .attr("transform",
-          "translate("+(-margin.left/1.3)+","+(height/2.0)+")rotate(-90)")
+          "translate("+(-padding.left/1.3)+","+(height/2.0)+")rotate(-90)")
     .attr("style", "font-size:" + ("label_size" in options ? options.label_size : 15) + "px;")
     .text(y_label);
 
   chart1.append("text")
     .attr("text-anchor", "middle")
-    .attr("transform", "translate("+(width + margin.right/1.3)+","+(height/2)+")rotate(-90)")
+    .attr("transform", "translate("+(width + padding.right/1.3)+","+(height/2)+")rotate(-90)")
     .attr("style", "font-size:" + ("label_size" in options ? options.label_size : 15) + "px;")
     .text(y2_label);
 
@@ -679,7 +682,7 @@ function plot_xy(destination, datasets, options) {
   }
 
   chart1.selectAll(".tick text")
-    .attr("font-size", ("axes_size" in options ? options.axes_size : 10));
+    .attr("font-size", axes_size);
 
   if ("circles" in options) {
     let color = "circle_color" in options ? options.circle_color : colors(color_index);
