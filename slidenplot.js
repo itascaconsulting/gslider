@@ -544,7 +544,7 @@ function plot_xy(destination, datasets, options) {
     let yarray = d[1];
     let path = chart1.append("path")
       .attr("class", "line")
-      .attr("stroke", colors((i+color_index)%options.colors.length))
+      .attr("stroke", colors((i+color_index)%("colors" in options ? options.colors.length : 10)))
       .attr("stroke-width", 'line_width' in options ? options.line_width + 'px' : '2px')
       .attr("fill", 'none')
       .attr("d", valueline(xarray, yarray, x, y));
