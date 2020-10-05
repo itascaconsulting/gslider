@@ -114,11 +114,13 @@ properties:
  - `font_size`: The font size of the text
  - `min`: The minimum value allowed 
  - `max`: The maximum value allowed
+ - `step`: The step interval of the input box
  - `text_format`: The d3 format of the input box's value
  - `inline`: Whether the input label and the input box should be on the same line (`true`) or separate lines (`false`)
  - `margin`: The margins surrounding the input area. Given as a css string.
  - `info_text`: adds the text as a small info pop-up for the slider
  - `info_text_size`: text size of the info text
+ - `info_text_width`: The pixel width of the info text pop-up
 
 `add_drop_down(target, short_name, long_name, selections, options`
 
