@@ -182,6 +182,7 @@ var SlidenPlotApp = (function() {
     let radio_div = d3.select(target)
       .append('div')
       .attr("class", "radio_div")
+      .attr('id', 'radio_div_' + short_name)
       .attr("style", "font-size: " + font_size + "px; clear: both; overflow: hidden; margin: " + margin);
     radio_div.append('p')
       .text(name)
@@ -212,12 +213,17 @@ var SlidenPlotApp = (function() {
       return document.querySelector('input[name="'+short_name+'"]:checked').value;
     };
     set_inputs[short_name] = function(selected_value) { selections[selected_value].attr("checked",""); };
+
+    return radio_div;
   }
 
   var add_check_box = function(target, short_name, name, checked) {
-    d3.select(target)
-      .append('div').text(name);
-    var input =  d3.select(target).append("input");
+    let check_box_div = d3.select(target)
+      .append('div')
+      .text(name)
+      .attr('class', 'check_box_div');
+
+    var input =  check_box_div.append("input");
     input.attr("type", "checkbox")
       .attr("name", short_name)
       .attr("value", short_name)
@@ -231,10 +237,9 @@ var SlidenPlotApp = (function() {
     let input_width = options.input_width || 150,
         font_size = options.font_size || 16,
         text_format = options.text_format || d3.format(".6e"),
-        max = options.max || Number.MAX_VALUE,
-        min = options.min || Number.MIN_VALUE,
         inline = options.inline || false,
-        margin = options.margin || "5px 5px"
+        margin = options.margin || "5px 5px",
+        step = options.step || 1
 
     let input_div = d3.select(target)
       .append("div")
@@ -245,7 +250,7 @@ var SlidenPlotApp = (function() {
 
     // Header
     let header = input_div.append("div")
-      .attr('style', 'height: ' + (font_size*1.2) + 'px;');
+      .attr('style', 'height: ' + (font_size*1.5) + 'px;');
     header.append("p")
       .text(long_name)
       .attr('style', "margin-right: 5px; float: left; font-size: " + font_size + 'px;')
@@ -255,6 +260,7 @@ var SlidenPlotApp = (function() {
         .append("input")
         .attr("name", short_name)
         .attr("type", "number")
+        .attr('step', step)
         .property('value', text_format(starting_value));
     if (inline) {
       input_box.attr("style", "float:left;width: " + input_width + "px; font-size: " + font_size + "px;" +
@@ -263,20 +269,29 @@ var SlidenPlotApp = (function() {
       input_box.attr("style", "clear:both;position:static;width: " + input_width + "px; font-size: " + font_size + "px")
     }
 
+    // minimum & maximum
+    if ('min' in options) {
+      input_box.attr('min', options.min);
+    }
+    if ('max' in options) {
+      input_box.attr('max', options.max);
+    }
+
     // Add info text
     if ("info_text" in options) {
-      let info_text_size = options.info_text_size || font_size;
+      let info_text_size = options.info_text_size || font_size,
+          info_text_width = options.info_text_width || (input_width + 1);
       let info_target;
       let text_style = "border: 1px solid black; background: #cbcbcb; position: absolute;" +
                        "padding: 2px 2px; white-space: pre-wrap; border-radius: 6px; z-index: 2;" +
                        "font-size: " + info_text_size + "px;"
       if (inline) {
         info_target = input_div;
-        text_style += "width: " + (document.getElementById("input_div_" + short_name).clientWidth - 6) + "px;" +
+        text_style += "width: " + info_text_width + "px;" +
                       "transform: translateY(" + (font_size + 5) + "px);"
       } else {
         info_target = header;
-        text_style += "width: " + (input_width + 1) + "px; transform: translateY(" + (font_size + 4) + "px);"
+        text_style += "width: " + info_text_width + "px; transform: translateY(" + (font_size + 4) + "px);"
       }
       info_target.append("div")
           .attr("id", "info_img_" + short_name)
@@ -346,7 +361,7 @@ var SlidenPlotApp = (function() {
 
   }
 
-    var add_drop_down = function(target, short_name, name, selections, options) {
+  var add_drop_down = function(target, short_name, name, selections, options) {
     options = options || {};
     let margin = options.margin || "5px",
         font_size = options.font_size || 14;
@@ -403,9 +418,9 @@ function plot_xy(destination, datasets, options) {
   var y2_label = options.y2_label || "";
   var title = options.title || "";
 
-  var padding = "padding" in options ? options.padding : {top: 30, right: 80, bottom: 40, left: 80},
-      width = ("width" in options ? options.width : 400) - padding.left - padding.right,
-      height = ("height" in options ? options.height : 200) - padding.top - padding.bottom;
+  var margin = "margin" in options ? options.margin : {top: 30, right: 80, bottom: 40, left: 80},
+      width = ("width" in options ? options.width : 400) - margin.left - margin.right,
+      height = ("height" in options ? options.height : 200) - margin.top - margin.bottom;
 
   var label_size = "label_size" in options ? options.label_size : 15,
       axes_size = "axes_size" in options ? options.axes_size : 10,
@@ -508,11 +523,11 @@ function plot_xy(destination, datasets, options) {
 
   var chart1 = d3.select(destination)
       .append("svg")
-      .attr("width", width + padding.left + padding.right)
-      .attr("height", height + padding.top + padding.bottom)
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
       .attr("style", "overflow:hidden;")
       .append("g")
-      .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   chart1.append("text")
     .attr("text-anchor", "middle")
@@ -522,20 +537,20 @@ function plot_xy(destination, datasets, options) {
 
   chart1.append("text")
     .attr("text-anchor", "middle")
-    .attr("transform", "translate("+ (width/2)+","+(-padding.top/2.5)+")")
+    .attr("transform", "translate("+ (width/2)+","+(-margin.top/2.5)+")")
     .attr("style", "font-size:" + ("title_size" in options ? options.title_size : 15) + "px; font-weight:bold")
     .text(title);
 
   chart1.append("text")
     .attr("text-anchor", "middle")
     .attr("transform",
-          "translate("+(-padding.left/1.3)+","+(height/2.0)+")rotate(-90)")
+          "translate("+(-margin.left/1.3)+","+(height/2.0)+")rotate(-90)")
     .attr("style", "font-size:" + ("label_size" in options ? options.label_size : 15) + "px;")
     .text(y_label);
 
   chart1.append("text")
     .attr("text-anchor", "middle")
-    .attr("transform", "translate("+(width + padding.right/1.3)+","+(height/2)+")rotate(-90)")
+    .attr("transform", "translate("+(width + margin.right/1.3)+","+(height/2)+")rotate(-90)")
     .attr("style", "font-size:" + ("label_size" in options ? options.label_size : 15) + "px;")
     .text(y2_label);
 
@@ -698,15 +713,15 @@ function plot_xy(destination, datasets, options) {
   if ("show_datapoints" in options) {
     // Turn into array if not an array
     if (!(Array.isArray(options.show_datapoints))) {
-      options.show_datapoints = [options.show_datapoints];
+      options.show_datapoints = datasets.map(function (e) { return options.show_datapoints; });
     }
     // Initialize defaults
-    let color = options.datapoint_color || colors(color_index);
     let radius = options.datapoint_radius || 5;
     // Iterate through datasets
     for (let i = 0; i < options.show_datapoints.length; i++) {
       if (options.show_datapoints[i]) {
         let d = datasets[i];
+        let color = options.datapoint_color || colors(color_index + i);
         for (let i = 0; i < d[0].length; i++) {
           chart1.append("circle")
                 .attr("cx", x(d[0][i]))
