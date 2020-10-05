@@ -239,6 +239,8 @@ var SlidenPlotApp = (function() {
         text_format = options.text_format || d3.format(".6e"),
         inline = options.inline || false,
         margin = options.margin || "5px 5px",
+        max = options.max || Number.MAX_VALUE,
+        min = options.min || Number.MIN_VALUE,
         step = options.step || 1
 
     let input_div = d3.select(target)
