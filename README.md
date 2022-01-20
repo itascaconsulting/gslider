@@ -30,7 +30,8 @@ interactive inputs and instant result plotting. The library depends on
 
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://unpkg.com/d3-simple-slider"></script>
-    <script src="https://s3.us-east-2.amazonaws.com/icgprojects/2857-16/slidenplot.js" charset="utf-8"></script>
+    <script src="https://s3.us-east-2.amazonaws.com/icgprojects/2857-16/plot_xy.js" charset="utf-8"></script>
+    <script src="https://s3.us-east-2.amazonaws.com/icgprojects/2857-16/sliders.js" charset="utf-8"></script>
     <script>
      var my_app = SlidenPlotApp();
      my_app.add_float_slider("#inputs", "A", "Amplitude", 1, 0.1, 10);
@@ -55,7 +56,7 @@ interactive inputs and instant result plotting. The library depends on
                 x_label: "Time [s]",
                 y_label: "Pressure [Pa]"});
      }
-     my_app.add_callback(my_callback);
+     my_app.set_callback(my_callback);
     </script>
   </body>
 </html>
@@ -70,10 +71,10 @@ This object has the following methods:
 
 `add_float_slider(selector, short_name, long_name, starting_value, min, max, options)`
 
-Add a floating point slider and a connected input box to the HTML element given by `selector`. `short_name` is used to 
+Add a floating point slider and a connected input box to the HTML element given by `selector`. `short_name` is used to
 access the values, `long_name` is used as the input label, `starting_value` gives the initial value of the slider, `min`
-and `max` are the limits of the sliders. Moving the slider updates the input box and vice versa. The input box allows 
-for more decimal places and is treated as the authoritative value. Only floating point values equal to `min` or `max` 
+and `max` are the limits of the sliders. Moving the slider updates the input box and vice versa. The input box allows
+for more decimal places and is treated as the authoritative value. Only floating point values equal to `min` or `max`
 or between `min` and `max` are accepted in the input box. The optional `options` argument can have the following
 properties:
 
@@ -88,7 +89,7 @@ properties:
 
 `add_radio_buttons(selector, short_name, long_name, button_names, starting_value, options)`
 
-Add a set of radio buttons to the HTML element given by `selector`. `short_name` is used to access the values, 
+Add a set of radio buttons to the HTML element given by `selector`. `short_name` is used to access the values,
 `long_name` is used as the input label, `button_names` is an array of strings giving the button names. The button names
 are also used as the input value. `starting_value` can be the value of one of the buttons to make that button initially
 selected. The optional `options` argument can have the following properties:
@@ -112,7 +113,7 @@ properties:
 
  - `input_width`: The width of the input box in pixels
  - `font_size`: The font size of the text
- - `min`: The minimum value allowed 
+ - `min`: The minimum value allowed
  - `max`: The maximum value allowed
  - `step`: The step interval of the input box
  - `text_format`: The d3 format of the input box's value
@@ -124,7 +125,7 @@ properties:
 
 `add_drop_down(target, short_name, long_name, selections, options`
 
-Adds a drop-down box to the HTML element given by `selector`. `short_name` is used to access the values, 
+Adds a drop-down box to the HTML element given by `selector`. `short_name` is used to access the values,
 `long_name` is used as the label, and `selections` is an array of possible options that the drop down contains.
 The optional `options` argument can have the following properties:
 
@@ -146,7 +147,7 @@ invoked. It is not typically necessary to call this function but it is available
 `set_values(data)`
 
 Sets the values of the plot's input elements according to the data parameter. `data` is a dictionary mapping the
-short names of the elements to their new value(s). 
+short names of the elements to their new value(s).
 
 ### Plotting
 The `plot_xy` function is provided to simplify
@@ -196,7 +197,7 @@ optional `options` argument can have the following properties:
               dataset is set to the respective array element (of the same index).
  - `show_datapoints`: A single boolean or an array of booleans indicating whether datapoints should be drawn for the plots.
                       If a single boolean and true, draws datapoints for every plot. Else, draws datapoints for the
-                      plots where the boolean at the respective index is true.   
+                      plots where the boolean at the respective index is true.
 
 A second y-axis, on the right-side of the plot, can be added by
 specifying these properties in the `options` argument:

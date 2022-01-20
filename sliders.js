@@ -45,7 +45,8 @@ var SlidenPlotApp = (function() {
         text_format = options.text_format || d3.format(".6e"),
         units = options.units || "",
         margin = options.margin || "5px",
-        text_box_input = true;
+        text_box_input = true,
+        last_valid_text_box_input = undefined;
 
     if (!(start >= min)) throw "Start must be greater than or equal to min.";
     if (!(start <= max)) throw "Start must be less than or equal to max.";
@@ -116,7 +117,7 @@ var SlidenPlotApp = (function() {
       .property("step", (max - min)/100.0)
       .attr("style", "clear:both;position:static;width: " + input_width + "px; font-size: " + font_size + "px");
     slider_div.append("div").text(units);
-
+    last_valid_text_box_input = start;
     var formatter = (max < 1e3) ? d3.format("") : d3.format(".1e");
     var slider = d3
         .sliderHorizontal()
@@ -130,29 +131,31 @@ var SlidenPlotApp = (function() {
         .displayValue(false)
         .on('onchange.a', function (value)
             {
-              console.log("in slider on change");
-              console.log("slider value = " + value);
-              console.log("text_box_input: " + text_box_input);
+              // console.log("in slider on change");
+              // console.log("slider value = " + value);
+              // console.log("text_box_input: " + text_box_input);
               if (! text_box_input) {
                 input_box.property("value", text_format(value));
+                last_valid_text_box_input = value;
                 internal_callback();
               }
             })
         .on('drag', function (value)
             {
-              console.log("in drag");
-              console.log(value);
-              console.log(text_box_input);
+              // console.log("in drag");
+              // console.log(value);
+              // console.log(text_box_input);
               text_box_input = false;
               input_box.property("value", text_format(value));
             })
         .on('end', function (value)
             {
-              console.log("in end");
-              console.log(value);
-              console.log(text_box_input);
+              // console.log("in end");
+              // console.log(value);
+              // console.log(text_box_input);
               text_box_input = false;
               input_box.property("value", text_format(value));
+              last_valid_text_box_input = value;
             });
     getters_[short_name] = (function () {
       //console.log("in getter");
@@ -172,58 +175,41 @@ var SlidenPlotApp = (function() {
       .attr('transform', 'translate(12,20)')
       .call(slider);
 
+    function handle_input_update(newValue) {
+      if (!isNaN(newValue) && (newValue <= max) && (newValue >= min)) {
+        text_box_input = true;
+        input_box.property('value', text_format(newValue));
+        slider.value(newValue);
+        internal_callback();
+        last_valid_text_box_input = newValue;
+      } else {
+        input_box.property("value", text_format(last_valid_text_box_input));
+        input_box.transition().duration(250).style("background-color", "red") .transition().duration(1000).style("background-color", "#FFF");
+      }
+    }
     // link input box change to slider
     input_box.on("click", function () {
-      console.log("in click on box");
-      console.log(text_box_input);
       var newValue = parseFloat(input_box.property('value'));
-      input_box.value = text_format(newValue);
-      if (newValue) {
-        if (newValue <= max && newValue >= min) {
-          text_box_input = true;
-          slider.value(newValue);
-          internal_callback();
-        }
-      }
+      handle_input_update(newValue);
     });
 
     input_box.on("keyup",function (e, b) {
-      console.log("in key up on box");
-      console.log(text_box_input);
       let codes = ['Enter'];
       if (codes.includes(d3.event.key)) {
         var newValue = parseFloat(input_box.property('value'));
-        input_box.property('value', text_format(newValue));
-        if (newValue) {
-          if (newValue <= max && newValue >= min) {
-            text_box_input = true;
-            slider.value(newValue);
-            internal_callback();
-          }
-        }
-        // here we need to check that we accept the new value and if not reset it
+        handle_input_update(newValue);
       }
     });
 
     input_box.on("focusout", function(e, b) {
-      // may not actually need this??
-      console.log("in focus out on box");
-      console.log(text_box_input);
       var newValue = parseFloat(input_box.property('value'));
-      input_box.property('value', text_format(newValue));
-      if (newValue) {
-        if (newValue <= max && newValue >= min) {
-          text_box_input = true;
-          slider.value(newValue);
-          internal_callback();
-        }
-        // here we need to check that we accept the new value and if not reset it
-      }
+        handle_input_update(newValue);
     });
 
     set_inputs[short_name] = function(new_data) {
       console.log("in setter");
       text_box_input = true;
+      last_valid_text_box_input = new_data;
       slider.value(new_data);
     };
     return slider;

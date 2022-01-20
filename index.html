@@ -15,7 +15,8 @@
 
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://unpkg.com/d3-simple-slider"></script>
-    <script src="./slidenplot.js" charset="utf-8"></script>
+    <script src="./plot_xy.js" charset="utf-8"></script>
+    <script src="./sliders.js" charset="utf-8"></script>
     <script>
      var my_app = SlidenPlotApp();
      my_app.add_float_slider("#inputs", "A", "Amplitude", 1, 0.1, 10);
@@ -40,7 +41,7 @@
                 x_label: "Time [s]",
                 y_label: "Pressure [Pa]"});
      }
-     my_app.add_callback(my_callback);
+     my_app.set_callback(my_callback);
     </script>
   </body>
 </html>
