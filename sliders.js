@@ -2,41 +2,37 @@ var SlidenPlotApp = (function() {
 
   var getters_ = {},
       user_callback = undefined,
-      set_inputs = {}, // dictionary mapping short_name to function(new_data) that sets new data
-      internal_callback = function() { user_callback(get_values()); };
+      // dictionary mapping short_name to function(new_data) that sets new data
+      set_inputs = {},
+      internal_callback = function() {
+        var new_values = get_values();
+        console.log(new_values);
+        user_callback(new_values); };
 
   var get_values = function() {
-    /**
-     * Returns the parameters of the app as a dictionary accessed by short name
-     */
+    // Returns the parameters of the app as a dictionary accessed by short name
     var ret = {};
     for (var key in getters_) {
       if (!getters_.hasOwnProperty(key)) continue;
       ret[key] = getters_[key].call();
     }
     return ret;
-  }
+  };
 
   var set_values = function(new_data, execute_callback) {
-    /**
-     * Sets the parameters of the app
-     */
     execute_callback = execute_callback === undefined ? true : execute_callback;
     for (let key in new_data) {
-      set_inputs[key](new_data[key])
+      set_inputs[key](new_data[key]);
     }
     if (execute_callback) {
       user_callback(get_values());
     }
-  }
+  };
 
   var set_callback = function(callback) {
-    /**
-     * Sets the callback to the inputted function
-     */
     user_callback = callback;
-    internal_callback()
-  }
+    internal_callback();
+  };
 
   var add_float_slider = function(target, short_name, name, start, min_, max_, options) {
     var min = min_,
@@ -47,7 +43,9 @@ var SlidenPlotApp = (function() {
         fill = options.fill === undefined ? null : options.fill,
         font_size = options.font_size || 12,
         text_format = options.text_format || d3.format(".6e"),
-        margin = options.margin || "5px";
+        units = options.units || "",
+        margin = options.margin || "5px",
+        text_box_input = true;
 
     if (!(start >= min)) throw "Start must be greater than or equal to min.";
     if (!(start <= max)) throw "Start must be less than or equal to max.";
@@ -69,10 +67,10 @@ var SlidenPlotApp = (function() {
         .attr("id", "info_img_" + short_name)
         .text("?")
         .attr("style", "float:left; margin: 0 0 0 10px;font-size: " + (font_size - 1) + "px; position: relative;" +
-                       "top: -" + (font_size / 36 * 5) + "px" + "; border: 1px solid blue;" +
-                       "border-radius: " + (font_size + 2) + "px; width: " + (font_size + 2) + "px;" +
-                       "height: " + (font_size + 2) + "px; text-align: center;" +
-                       "color: blue; text-decoration: none; cursor: default")
+              "top: -" + (font_size / 36 * 5) + "px" + "; border: 1px solid blue;" +
+              "border-radius: " + (font_size + 2) + "px; width: " + (font_size + 2) + "px;" +
+              "height: " + (font_size + 2) + "px; text-align: center;" +
+              "color: blue; text-decoration: none; cursor: default");
       slider_div_header
         .append("div")
         .attr('class', 'info')
@@ -80,34 +78,46 @@ var SlidenPlotApp = (function() {
         .attr("style", "border: 1px solid black; background: #cbcbcb; position: absolute;" +
                        "width: " + (-6.67 + slider_width) + "px;font-size: " + info_text_size + "px;" +
                        "padding: 2px 2px; white-space: pre-wrap; border-radius: 6px; z-index: 2;" +
-                       "transform: translateY(" + (font_size + 5) + "px);")
+              "transform: translateY(" + (font_size + 5) + "px);");
       // Add hovering style for info
       let style;
       style = document.getElementById("sliders_info_style");
       if (!style) {
         style = document.createElement('style', { is : 'text/css' });
         style.id = "sliders_info_style";
-        style.innerHTML = '.info { display: none; } '
+        style.innerHTML = '.info { display: none; } ';
         document.getElementsByTagName('head')[0].appendChild(style);
       }
       style.innerHTML = style.innerHTML + '#info_img_' + short_name + ':hover + .info { display: block; }';
     }
 
+    // when a value is set it should go exactly as is in the text box
+    // and that should be the true value. A flag for each slider
+    // should say where the true value is. When inputs comes from the
+    // slider the text box should be updated, when the text box is
+    // updated the value should stay as is and the slider should be
+    // set to approximatly the correct position and should not update the text box
+
+    //when set_inputs[short_name]() is called flag text_box_input is true
+
+
+
     // Add input box
     let input_div = slider_div
       .append('div')
-      .attr("style", "clear:both;width:" + input_width + "px;")
+        .attr("style", "clear:both;width:" + input_width + "px;");
     var input_box = input_div
         .append("input")
-        .attr("name", short_name)
+        .attr("name", short_name);
     input_box.attr("type", "number")
       .property('value', text_format(start))
       .property("min", min)
       .property("max", max)
       .property("step", (max - min)/100.0)
-      .attr("style", "clear:both;position:static;width: " + input_width + "px; font-size: " + font_size + "px")
+      .attr("style", "clear:both;position:static;width: " + input_width + "px; font-size: " + font_size + "px");
+    slider_div.append("div").text(units);
 
-    var formatter = (max < 1e3) ? d3.format("") : d3.format(".1e");
+    var formatter = (max < 1e9) ? d3.format("") : d3.format(".1e");
     var slider = d3
         .sliderHorizontal()
         .min(min)
@@ -119,12 +129,40 @@ var SlidenPlotApp = (function() {
         .ticks(5).tickFormat(formatter)
         .displayValue(false)
         .on('onchange.a', function (value)
-            { input_box.property("value", text_format(value)); internal_callback() })
+            {
+              console.log("in slider on change");
+              console.log("slider value = " + value);
+              console.log("text_box_input: " + text_box_input);
+              if (! text_box_input) {
+                input_box.property("value", text_format(value));
+                internal_callback();
+              }
+            })
         .on('drag', function (value)
-            { input_box.property("value", text_format(value)); })
+            {
+              console.log("in drag");
+              console.log(value);
+              console.log(text_box_input);
+              text_box_input = false;
+              input_box.property("value", text_format(value));
+            })
         .on('end', function (value)
-            { input_box.property("value", text_format(value)); });
-    getters_[short_name] = (function () { return slider.value(); });
+            {
+              console.log("in end");
+              console.log(value);
+              console.log(text_box_input);
+              text_box_input = false;
+              input_box.property("value", text_format(value));
+            });
+    getters_[short_name] = (function () {
+      //console.log("in getter");
+      //console.log(text_box_input);
+      if (text_box_input) {
+        return parseFloat(input_box.property('value')); //
+      } else {
+        return slider.value();
+      }
+    });
 
     slider_div
       .append('svg')
@@ -136,49 +174,66 @@ var SlidenPlotApp = (function() {
 
     // link input box change to slider
     input_box.on("click", function () {
+      console.log("in click on box");
+      console.log(text_box_input);
       var newValue = parseFloat(input_box.property('value'));
-      input_box.value = text_format(newValue)
+      input_box.value = text_format(newValue);
       if (newValue) {
         if (newValue <= max && newValue >= min) {
-          slider.value(newValue);
-          internal_callback(); // slider.value() is bugged and does not invoke onchange listener
-        }
-      }
-    });
-
-    input_box.on("keyup",function (e, b) {
-      let codes = ['Enter'];
-      if (codes.includes(d3.event.key)) {
-        var newValue = parseFloat(input_box.property('value'));
-        input_box.property('value', text_format(newValue))
-        if (newValue) {
-          if (newValue <= max && newValue >= min) {
-            slider.value(newValue);
-            internal_callback();
-          }
-        }
-      }
-    });
-
-    input_box.on("focusout", function(e, b) {
-      var newValue = parseFloat(input_box.property('value'));
-      input_box.property('value', text_format(newValue))
-      if (newValue) {
-        if (newValue <= max && newValue >= min) {
+          text_box_input = true;
           slider.value(newValue);
           internal_callback();
         }
       }
     });
-    set_inputs[short_name] = function(new_data) {slider.value(new_data); };
+
+    input_box.on("keyup",function (e, b) {
+      console.log("in key up on box");
+      console.log(text_box_input);
+      let codes = ['Enter'];
+      if (codes.includes(d3.event.key)) {
+        var newValue = parseFloat(input_box.property('value'));
+        input_box.property('value', text_format(newValue));
+        if (newValue) {
+          if (newValue <= max && newValue >= min) {
+            text_box_input = true;
+            slider.value(newValue);
+            internal_callback();
+          }
+        }
+        // here we need to check that we accept the new value and if not reset it
+      }
+    });
+
+    input_box.on("focusout", function(e, b) {
+      // may not actually need this??
+      console.log("in focus out on box");
+      console.log(text_box_input);
+      var newValue = parseFloat(input_box.property('value'));
+      input_box.property('value', text_format(newValue));
+      if (newValue) {
+        if (newValue <= max && newValue >= min) {
+          text_box_input = true;
+          slider.value(newValue);
+          internal_callback();
+        }
+        // here we need to check that we accept the new value and if not reset it
+      }
+    });
+
+    set_inputs[short_name] = function(new_data) {
+      console.log("in setter");
+      text_box_input = true;
+      slider.value(new_data);
+    };
     return slider;
-  }
+  };
 
   var add_radio_buttons = function(target, short_name, name, button_names, checked, options) {
     options = options || {};
     let font_size = options.font_size || 12,
         inline = options.inline || false,
-        margin = options.margin || "5px 5px"
+        margin = options.margin || "5px 5px";
     let radio_div = d3.select(target)
       .append('div')
       .attr("class", "radio_div")
@@ -186,11 +241,11 @@ var SlidenPlotApp = (function() {
       .attr("style", "font-size: " + font_size + "px; clear: both; overflow: hidden; margin: " + margin);
     radio_div.append('p')
       .text(name)
-      .attr("style", "margin: 0 0;")
+      .attr("style", "margin: 0 0;");
 
     let selections = {};
     for (let i=0; i<button_names.length; i++) {
-      let section = radio_div.append("div")
+      let section = radio_div.append("div");
       if (inline) {
         section.attr("style", "float: left; margin: 5px 5px 0 0; height: " + (font_size + 3) + "px");
       } else {
@@ -215,7 +270,7 @@ var SlidenPlotApp = (function() {
     set_inputs[short_name] = function(selected_value) { selections[selected_value].attr("checked",""); };
 
     return radio_div;
-  }
+  };
 
   var add_check_box = function(target, short_name, name, checked) {
     let check_box_div = d3.select(target)
@@ -241,7 +296,7 @@ var SlidenPlotApp = (function() {
         margin = options.margin || "5px 5px",
         max = options.max || Number.MAX_VALUE,
         min = options.min || Number.MIN_VALUE,
-        step = options.step || 1
+        step = options.step || 1;
 
     let input_div = d3.select(target)
       .append("div")
@@ -255,7 +310,7 @@ var SlidenPlotApp = (function() {
       .attr('style', 'height: ' + (font_size*1.5) + 'px;');
     header.append("p")
       .text(long_name)
-      .attr('style', "margin-right: 5px; float: left; font-size: " + font_size + 'px;')
+      .attr('style', "margin-right: 5px; float: left; font-size: " + font_size + 'px;');
 
     // Input box
     let input_box = input_div
@@ -266,9 +321,9 @@ var SlidenPlotApp = (function() {
         .property('value', text_format(starting_value));
     if (inline) {
       input_box.attr("style", "float:left;width: " + input_width + "px; font-size: " + font_size + "px;" +
-                              "transform: translateY(-12.5%);")
+                     "transform: translateY(-12.5%);");
     } else {
-      input_box.attr("style", "clear:both;position:static;width: " + input_width + "px; font-size: " + font_size + "px")
+      input_box.attr("style", "clear:both;position:static;width: " + input_width + "px; font-size: " + font_size + "px");
     }
 
     // minimum & maximum
@@ -285,48 +340,48 @@ var SlidenPlotApp = (function() {
           info_text_width = options.info_text_width || (input_width + 1);
       let info_target;
       let text_style = "border: 1px solid black; background: #cbcbcb; position: absolute;" +
-                       "padding: 2px 2px; white-space: pre-wrap; border-radius: 6px; z-index: 2;" +
-                       "font-size: " + info_text_size + "px;"
+          "padding: 2px 2px; white-space: pre-wrap; border-radius: 6px; z-index: 2;" +
+          "font-size: " + info_text_size + "px;";
       if (inline) {
         info_target = input_div;
         text_style += "width: " + info_text_width + "px;" +
-                      "transform: translateY(" + (font_size + 5) + "px);"
+          "transform: translateY(" + (font_size + 5) + "px);";
       } else {
         info_target = header;
-        text_style += "width: " + info_text_width + "px; transform: translateY(" + (font_size + 4) + "px);"
+        text_style += "width: " + info_text_width + "px; transform: translateY(" + (font_size + 4) + "px);";
       }
       info_target.append("div")
           .attr("id", "info_img_" + short_name)
           .text("?")
-          .attr("style", "float:left; margin: 0 0 0 5px;font-size: " + (font_size - 1) + "px; position: relative;" +
-                         "top: -" + (font_size / 36 * 5) + "px" + "; border: 1px solid blue;" +
-                         "border-radius: " + (font_size + 2) + "px; width: " + (font_size + 2) + "px;" +
-                         "height: " + (font_size + 2) + "px; text-align: center;" +
-                         "color: blue; text-decoration: none; cursor: default")
+        .attr("style", "float:left; margin: 0 0 0 5px;font-size: " + (font_size - 1) + "px; position: relative;" +
+              "top: -" + (font_size / 36 * 5) + "px" + "; border: 1px solid blue;" +
+              "border-radius: " + (font_size + 2) + "px; width: " + (font_size + 2) + "px;" +
+              "height: " + (font_size + 2) + "px; text-align: center;" +
+              "color: blue; text-decoration: none; cursor: default");
       info_target.append("div")
         .attr('class', 'info')
         .text(options.info_text)
-        .attr("style", text_style)
+        .attr("style", text_style);
       // Add hovering style for info
       let style;
       style = document.getElementById("sliders_info_style");
       if (!style) {
         style = document.createElement('style', { is : 'text/css' });
         style.id = "sliders_info_style";
-        style.innerHTML = '.info { display: none; } '
+        style.innerHTML = '.info { display: none; } ';
         document.getElementsByTagName('head')[0].appendChild(style);
       }
       style.innerHTML = style.innerHTML + '#info_img_' + short_name + ':hover + .info { display: block; }';
     }
 
     // Handle options
-    if ('max' in options) input_box.property("max", options.max)
-    if ('min' in options) input_box.property("min", options.min)
+    if ('max' in options) input_box.property("max", options.max);
+    if ('min' in options) input_box.property("min", options.min);
 
     // Link callback to input change
     input_box.on("click", function () {
       let newValue = parseFloat(input_box.property('value'));
-      input_box.property('value', text_format(newValue))
+      input_box.property('value', text_format(newValue));
       if (newValue) {
         if (newValue <= max && newValue >= min) {
           internal_callback();
@@ -338,7 +393,7 @@ var SlidenPlotApp = (function() {
       let codes = ['Enter'];
       if (codes.includes(d3.event.key)) {
         var newValue = parseFloat(input_box.property('value'));
-        input_box.property('value', text_format(newValue))
+        input_box.property('value', text_format(newValue));
         if (newValue) {
           if (newValue <= max && newValue >= min) {
             internal_callback();
@@ -349,7 +404,7 @@ var SlidenPlotApp = (function() {
 
     input_box.on("focusout", function(e, b) {
       var newValue = parseFloat(input_box.property('value'));
-      input_box.property('value', text_format(newValue))
+      input_box.property('value', text_format(newValue));
       if (newValue) {
         if (newValue <= max && newValue >= min) {
           internal_callback();
@@ -360,8 +415,7 @@ var SlidenPlotApp = (function() {
     getters_[short_name] = (function () { return parseFloat(input_box.property('value')); });
     set_inputs[short_name] = function(newValue) { input_box.property('value', text_format(newValue)); };
     return input_div;
-
-  }
+  };
 
   var add_drop_down = function(target, short_name, name, selections, options) {
     options = options || {};
@@ -391,7 +445,7 @@ var SlidenPlotApp = (function() {
     set_inputs[short_name] = function(newValue) { selector.property('value', newValue); };
     return selector_div;
 
-  }
+  };
 
   return {
     add_float_slider: add_float_slider,
@@ -402,6 +456,6 @@ var SlidenPlotApp = (function() {
     set_callback: set_callback,
     get_values: get_values,
     set_values: set_values
-  }
+  };
 
 });
