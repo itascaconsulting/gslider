@@ -117,7 +117,7 @@ var SlidenPlotApp = (function() {
       .attr("style", "clear:both;position:static;width: " + input_width + "px; font-size: " + font_size + "px");
     slider_div.append("div").text(units);
 
-    var formatter = (max < 1e9) ? d3.format("") : d3.format(".1e");
+    var formatter = (max < 1e3) ? d3.format("") : d3.format(".1e");
     var slider = d3
         .sliderHorizontal()
         .min(min)

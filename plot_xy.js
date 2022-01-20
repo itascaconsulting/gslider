@@ -27,7 +27,7 @@ function plot_xy(destination, datasets, options) {
   Number.isInteger = Number.isInteger || function(x) {
     return typeof x === "number" && isFinite(x) && Math.floor(x) === x;
   };
-  Math.sign = Math.sign || function (x) { // What is going on here???
+  Math.sign = Math.sign || function (x) {
     return x > 0 ? 1 : x < 0 ? -1 : x;
   };
 
@@ -77,7 +77,7 @@ function plot_xy(destination, datasets, options) {
                ymax_use*options.right_y_scale]);
   }
 
-  var tick_format = d3.format('');
+  var tick_format = d3.format('.1e');
 
   // tick format for logarithmic axes
   var log_format = function (d) {
@@ -122,14 +122,15 @@ function plot_xy(destination, datasets, options) {
       .attr("style", "overflow:hidden;")
       .append("g")
       .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
-  d3.select("svg").on("click", function() {
-    var coords = d3.mouse(this);
-          var newData= {
-            x: Math.round( x.invert(coords[0])),  // Takes the pixel number to convert to number
-            y: Math.round( y.invert(coords[1]))
-          };
-    console.log(newData);
-  });
+  // example of getting mouse input from a D3 plot
+  // d3.select("svg").on("click", function() {
+  //   var coords = d3.mouse(this);
+  //         var newData= {
+  //           x: Math.round( x.invert(coords[0])),  // Takes the pixel number to convert to number
+  //           y: Math.round( y.invert(coords[1]))
+  //         };
+  //   console.log(newData);
+  // });
   chart1.append("text")
     .attr("text-anchor", "middle")
     .attr("transform", "translate("+ (width/2)+","+(height+label_offset)+")")
