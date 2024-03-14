@@ -12,7 +12,7 @@ function plot_xy(destination, datasets, options) {
       y2_label = options.y2_label || "",
       title = options.title || "";
 
-  var padding = "padding" in options ? options.padding : {top: 30, right: 80, bottom: 40, left: 80},
+  var padding = "padding" in options ? options.padding : {top: 30, right: 80, bottom: 60, left: 80},
       width = ("width" in options ? options.width : 400) - padding.left - padding.right,
       height = ("height" in options ? options.height : 200) - padding.top - padding.bottom;
 
